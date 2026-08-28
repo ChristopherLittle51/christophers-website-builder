@@ -1,0 +1,45 @@
+.editor-shell { min-height: 100vh; background: #ecece7; }
+.editor-intro { align-items: center; background: #050505; color: white; display: flex; justify-content: space-between; min-height: 68px; padding: 12px 18px; }
+.editor-intro div { display: grid; gap: 3px; }
+.editor-intro span { color: #d8ff00; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.editor-intro strong { font-size: 13px; }
+.editor-intro__actions { align-items: center; display: flex !important; gap: 7px !important; }
+.editor-intro__actions form { display: contents; }
+.editor-intro a,.editor-intro button { background: transparent; border: 1px solid rgba(255,255,255,.5); color: white; cursor: pointer; font-size: 10px; padding: 9px 11px; text-transform: uppercase; }
+.save-state { color: #aaa !important; font-size: 9px !important; letter-spacing: .06em !important; margin-left: 5px; white-space: nowrap; }
+.save-state--published { color: #d8ff00 !important; }
+.save-state--error { color: #ff8989 !important; }
+.template-picker { background: #d8ff00; color: #050505; padding: 18px; position: relative; z-index: 20; }
+.template-picker > div:first-child { align-items: center; display: flex; justify-content: space-between; }
+.template-picker > div:first-child > span { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.template-picker > div:first-child button { background: none; border: 0; cursor: pointer; font-size: 26px; }
+.template-picker__grid { display: grid; gap: 8px; margin-top: 14px; }
+.template-picker__grid button { background: #f7f7f3; border: 1px solid #050505; cursor: pointer; display: grid; gap: 8px; padding: 16px; text-align: left; }
+.template-picker__grid strong { font-size: 18px; letter-spacing: -.03em; }
+.template-picker__grid span { font-size: 12px; line-height: 1.4; }
+.template-picker__grid em { font-size: 10px; font-style: normal; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.editor-loading,.editor-locked { align-items: center; background: #050505; color: white; display: flex; flex-direction: column; justify-content: center; min-height: 100vh; padding: 24px; text-align: center; }
+.editor-loading__mark,.editor-locked > span { align-items: center; background: #d8ff00; color: #050505; display: flex; font-size: 18px; font-weight: 900; height: 52px; justify-content: center; margin-bottom: 22px; width: 52px; }
+.editor-locked h1 { font-size: clamp(42px,8vw,88px); letter-spacing: -.06em; margin: 0; }
+.editor-locked p { color: #aaa; }
+.editor-locked a { border-bottom: 1px solid #d8ff00; color: #d8ff00; font-size: 11px; margin-top: 20px; padding-bottom: 5px; text-transform: uppercase; }
+.image-field { border: 1px dashed #aaa; border-radius: 6px; cursor: pointer; display: grid; gap: 8px; padding: 10px; }
+.image-field__label { font-size: 12px; font-weight: 700; }
+.image-field img,.image-field video { aspect-ratio: 16/9; border-radius: 4px; object-fit: cover; width: 100%; }
+.image-field__empty { align-items: center; background: #f1f1ed; color: #666; display: flex; font-size: 11px; justify-content: center; min-height: 88px; }
+.image-field__action { background: #111; border-radius: 4px; color: white; font-size: 11px; padding: 7px 10px; text-align: center; }
+.image-field__error { color: #a31d1d; font-size: 10px; line-height: 1.3; }
+.image-field input { height: 1px; opacity: 0; position: absolute; width: 1px; }
+.color-field { display: grid; gap: 7px; }
+.color-field > span { font-size: 12px; font-weight: 700; }
+.color-field > div { display: grid; gap: 6px; grid-template-columns: 42px 1fr; }
+.color-field input[type='color'] { border: 1px solid #ccc; height: 34px; padding: 2px; width: 42px; }
+.color-field input[type='text'] { border: 1px solid #ccc; border-radius: 4px; font: 12px ui-monospace,monospace; min-width: 0; padding: 7px; }
+
+@media (max-width: 699px) {
+  .editor-intro strong { display: none; }
+  .editor-intro a { font-size: 9px; }
+  .save-state { display: none; }
+}
+
+@media (min-width: 700px) { .template-picker__grid { grid-template-columns: repeat(3,1fr); } }

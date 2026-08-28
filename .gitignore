@@ -1,0 +1,9 @@
+.next/
+.vinext/
+node_modules/
+.env
+.env.local
+data/
+coverage/
+npm-debug.log*
+.DS_Store

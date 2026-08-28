@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Open Canvas monogram">
+  <rect width="128" height="128" rx="22" fill="#050505"/>
+  <circle cx="92" cy="36" r="23" fill="#d8ff00"/>
+  <path d="M20 35h49v58H20z" fill="none" stroke="#f7f7f3" stroke-width="10"/>
+  <path d="M69 55h39v38H69" fill="none" stroke="#f7f7f3" stroke-width="10"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1672 941" role="img" aria-label="Open Canvas Builder social card">
+  <rect width="1672" height="941" fill="#f7f7f3"/>
+  <rect x="42" y="42" width="1588" height="857" fill="none" stroke="#050505" stroke-width="4"/>
+  <circle cx="1390" cy="206" r="228" fill="#d8ff00"/>
+  <path d="M1090 899 1630 355v544Z" fill="#050505"/>
+  <rect x="95" y="86" width="140" height="140" rx="24" fill="#050505"/>
+  <circle cx="185" cy="136" r="26" fill="#d8ff00"/>
+  <path d="M119 131h54v64h-54zM173 153h38v42h-38" fill="none" stroke="#f7f7f3" stroke-width="11"/>
+  <text x="96" y="410" fill="#050505" font-family="Arial,Helvetica,sans-serif" font-size="66" font-weight="700" letter-spacing="10">OPEN CANVAS</text>
+  <text x="88" y="590" fill="#050505" font-family="Arial,Helvetica,sans-serif" font-size="154" font-weight="900" letter-spacing="-9">WEBSITE BUILDER</text>
+  <line x1="96" y1="658" x2="1240" y2="658" stroke="#050505" stroke-width="4"/>
+  <text x="96" y="733" fill="#050505" font-family="Arial,Helvetica,sans-serif" font-size="42">Mobile-first · self-hostable · made for creative work</text>
+  <text x="96" y="846" fill="#050505" font-family="Arial,Helvetica,sans-serif" font-size="29" font-weight="700" letter-spacing="4">DRAG · DROP · PUBLISH</text>
+</svg>
