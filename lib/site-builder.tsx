@@ -142,6 +142,56 @@ function CalendlyWidget({ url, height, isEditing }: { url: string; height: numbe
   </div>;
 }
 
+type FilmStripFrame = { image: string; alt: string; caption: string };
+
+function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: { title: ReactNode; stock: ReactNode; direction: string; frames: FilmStripFrame[]; theme: string; isEditing: boolean }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [scrollHeight, setScrollHeight] = useState<number>();
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const track = trackRef.current;
+    if (!section || !track || direction === 'vertical' || isEditing) {
+      setScrollHeight(undefined);
+      if (track) track.style.transform = '';
+      return;
+    }
+
+    let distance = 0;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const progress = Math.min(Math.max(-section.getBoundingClientRect().top, 0), distance);
+      track.style.transform = `translate3d(${-progress}px,0,0)`;
+    };
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    const measure = () => {
+      distance = Math.max(0, track.scrollWidth - section.clientWidth);
+      setScrollHeight(window.innerHeight + distance);
+      requestUpdate();
+    };
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(section);
+    observer.observe(track);
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', measure);
+    measure();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', requestUpdate);
+      window.removeEventListener('resize', measure);
+      if (frame) window.cancelAnimationFrame(frame);
+      track.style.transform = '';
+    };
+  }, [direction, frames, isEditing]);
+
+  return <section ref={sectionRef} className={`builder-filmstrip builder-filmstrip--${direction}${isEditing ? ' builder-filmstrip--editing' : ''} builder-theme--${theme}`} style={scrollHeight ? { height: scrollHeight } : undefined}><div className="builder-filmstrip__sticky"><header><p className="builder-kicker">{stock}</p><h2>{title}</h2></header><div className="builder-filmstrip__track-viewport"><div className="builder-filmstrip__track" ref={trackRef}>{(frames || []).map((filmFrame, index) => <figure key={`${filmFrame.image}-${index}`}><span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><img src={filmFrame.image} alt={filmFrame.alt || ''} /><figcaption>{filmFrame.caption}</figcaption></figure>)}</div></div></div></section>;
+}
+
 // Puck component props intentionally remain open-ended: templates are user data,
 // and each block validates/coerces only the fields it renders.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -149,6 +199,7 @@ export const builderConfig: Config<any> = {
   categories: {
     primitives: { title: 'Building blocks', components: ['HeadingBlock', 'ParagraphBlock', 'EyebrowBlock', 'ImageBlock', 'ButtonBlock', 'DividerBlock', 'SpacerBlock'], defaultExpanded: true },
     layout: { title: 'Layouts & sections', components: ['LayoutContainer', 'EditorialHero', 'SplitFeature', 'TextBlock'], defaultExpanded: true },
+    cinema: { title: 'Photo & cinema', components: ['FilmStripBlock', 'ContactSheetBlock', 'DirectorsSlateBlock', 'LensHeroBlock', 'ViewfinderBlock', 'StoryboardBlock', 'ReelShowcaseBlock', 'ColorGradeBlock', 'FilmStockBlock', 'EndCreditsBlock'], defaultExpanded: true },
     galleries: { title: 'Images & work', components: ['ExpandableGrid', 'ProjectGrid', 'GalleryBlock', 'ImageBlock', 'BeforeAfter'], defaultExpanded: true },
     storytelling: { title: 'Storytelling', components: ['StickyStory', 'TimelineBlock', 'QuoteBlock', 'VideoBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'MarqueeBlock', 'ContactBlock'], defaultExpanded: true },
     integrations: { title: 'Embeds & integrations', components: ['CalendlyBlock', 'CustomCodeBlock'], defaultExpanded: true },
@@ -306,6 +357,66 @@ export const builderConfig: Config<any> = {
       label: 'Kinetic marquee', fields: { text: { type: 'text', label: 'Marquee text', contentEditable: true }, font: fontField('Marquee font'), speed: { type: 'radio', label: 'Speed', options: [{ label: 'Slow', value: 'slow' }, { label: 'Medium', value: 'medium' }, { label: 'Fast', value: 'fast' }] }, direction: { type: 'radio', label: 'Direction', options: [{ label: 'Left', value: 'left' }, { label: 'Right', value: 'right' }] }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
       defaultProps: { text: 'FILM · PHOTO · DESIGN · STORIES · ', font: 'inherit', speed: 'medium', direction: 'left', theme: 'lime' },
       render: ({ text, font, speed, direction, theme }) => <section className={`builder-marquee builder-marquee--${speed} builder-marquee--${direction} builder-theme--${theme}`} style={fontStyle(font)} aria-label={typeof text === 'string' ? text : 'Creative services'}><div aria-hidden="true"><span>{text}</span><span>{text}</span><span>{text}</span></div></section>,
+    },
+    FilmStripBlock: {
+      label: 'Film strip',
+      fields: { title: { type: 'text', label: 'Title', contentEditable: true }, stock: { type: 'text', label: 'Film stock label' }, direction: { type: 'radio', label: 'Strip direction', options: [{ label: 'Horizontal', value: 'horizontal' }, { label: 'Vertical', value: 'vertical' }] }, frames: { type: 'array', label: 'Frames', min: 2, max: 12, arrayFields: { image: imageField('Frame image'), alt: { type: 'text', label: 'Image description' }, caption: { type: 'text', label: 'Frame caption' } }, defaultItemProps: (index) => ({ image: `/images/photo-${(index % 10) + 1}.jpg`, alt: 'Film still', caption: `Frame ${String(index + 1).padStart(2, '0')}` }), getItemSummary: (item, index) => item.caption || `Frame ${(index || 0) + 1}` }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { title: 'Selected frames', stock: '35 MM · 500 T · ROLL 07', direction: 'horizontal', frames: [{ image: '/images/photo-1.jpg', alt: 'Cinematic portrait', caption: 'INT. STUDIO — DAWN' }, { image: '/images/photo-2.jpg', alt: 'Subject in motion', caption: 'TAKE 04 / A CAM' }, { image: '/images/photo-3.jpg', alt: 'Location detail', caption: 'EXT. COAST — 18:42' }, { image: '/images/photo-4.jpg', alt: 'Final film still', caption: 'ROLL 07 / 016' }], theme: 'black' },
+      render: ({ title, stock, direction, frames, theme, puck }) => <ScrollFilmStrip title={title} stock={stock} direction={direction} frames={frames || []} theme={theme} isEditing={Boolean(puck?.isEditing)} />,
+    },
+    ContactSheetBlock: {
+      label: 'Contact sheet',
+      fields: { title: { type: 'text', label: 'Title', contentEditable: true }, roll: { type: 'text', label: 'Roll label' }, columns: { type: 'radio', label: 'Desktop columns', options: [{ label: 'Three', value: 'three' }, { label: 'Four', value: 'four' }, { label: 'Six', value: 'six' }] }, frames: { type: 'array', label: 'Contact prints', min: 3, max: 24, arrayFields: { image: imageField('Photograph'), alt: { type: 'text', label: 'Image description' }, selected: { type: 'radio', label: 'Select frame', options: [{ label: 'No', value: 'no' }, { label: 'Circle it', value: 'yes' }] } }, defaultItemProps: (index) => ({ image: `/images/photo-${(index % 10) + 1}.jpg`, alt: 'Contact sheet photograph', selected: index === 0 ? 'yes' : 'no' }), getItemSummary: (_item, index) => `Exposure ${String((index || 0) + 1).padStart(2, '0')}` } },
+      defaultProps: { title: 'Proofs / Lisbon', roll: 'ROLL 04 · 36 EXP · 2026', columns: 'four', frames: Array.from({ length: 8 }, (_, index) => ({ image: `/images/photo-${(index % 10) + 1}.jpg`, alt: `Contact sheet frame ${index + 1}`, selected: [1, 6].includes(index) ? 'yes' : 'no' })) },
+      render: ({ title, roll, columns, frames }) => <section className={`builder-contact-sheet builder-contact-sheet--${columns}`}><header><h2>{title}</h2><p>{roll}</p></header><div>{(frames || []).map((frame: { image: string; alt: string; selected: string }, index: number) => <figure className={frame.selected === 'yes' ? 'is-selected' : ''} key={`${frame.image}-${index}`}><img src={frame.image} alt={frame.alt || ''} /><figcaption>{String(index + 1).padStart(2, '0')}A</figcaption></figure>)}</div></section>,
+    },
+    DirectorsSlateBlock: {
+      label: 'Director’s slate',
+      fields: { production: { type: 'text', label: 'Production', contentEditable: true }, director: { type: 'text', label: 'Director' }, camera: { type: 'text', label: 'Camera' }, scene: { type: 'text', label: 'Scene' }, take: { type: 'text', label: 'Take' }, roll: { type: 'text', label: 'Roll' }, date: { type: 'text', label: 'Date' }, note: { type: 'textarea', label: 'Production note', contentEditable: true }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { production: 'A QUIET KIND OF LIGHT', director: 'DIRECTOR NAME', camera: 'DP NAME', scene: '24 B', take: '03', roll: 'A 007', date: '08 / 28 / 26', note: 'A graphic project opener for films, campaigns, and production diaries.', theme: 'paper' },
+      render: ({ production, director, camera, scene, take, roll, date, note, theme }) => <section className={`builder-slate-section builder-theme--${theme}`}><div className="builder-slate"><div className="builder-slate__clap" aria-hidden="true"><i /><i /><i /><i /><i /></div><h2>{production}</h2><dl><div><dt>Scene</dt><dd>{scene}</dd></div><div><dt>Take</dt><dd>{take}</dd></div><div><dt>Roll</dt><dd>{roll}</dd></div><div><dt>Director</dt><dd>{director}</dd></div><div><dt>Camera</dt><dd>{camera}</dd></div><div><dt>Date</dt><dd>{date}</dd></div></dl></div><p>{note}</p></section>,
+    },
+    LensHeroBlock: {
+      label: 'Lens / aperture hero',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'textarea', label: 'Headline', contentEditable: true }, image: imageField('Lens image'), imageAlt: { type: 'text', label: 'Image description' }, focalLength: { type: 'text', label: 'Focal length' }, aperture: { type: 'text', label: 'Aperture' }, iso: { type: 'text', label: 'ISO' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { eyebrow: 'Director of photography', title: 'LIGHT IS THE\nFIRST CHARACTER.', image: '/images/photo-5.jpg', imageAlt: 'Portrait framed through a circular lens', focalLength: '50 MM', aperture: 'ƒ / 1.4', iso: 'ISO 800', theme: 'black' },
+      render: ({ eyebrow, title, image, imageAlt, focalLength, aperture, iso, theme }) => <section className={`builder-lens-hero builder-theme--${theme}`}><div className="builder-lens-hero__copy"><p className="builder-kicker">{eyebrow}</p><h1>{title}</h1><div><span>{focalLength}</span><span>{aperture}</span><span>{iso}</span></div></div><figure className="builder-lens"><div className="builder-lens__glass"><img src={image} alt={imageAlt || ''} /></div><figcaption>{focalLength} · {aperture} · {iso}</figcaption></figure></section>,
+    },
+    ViewfinderBlock: {
+      label: 'Camera viewfinder',
+      fields: { image: imageField('Viewfinder image'), alt: { type: 'text', label: 'Image description' }, label: { type: 'text', label: 'Shot label', contentEditable: true }, timecode: { type: 'text', label: 'Timecode' }, lens: { type: 'text', label: 'Lens readout' }, format: { type: 'radio', label: 'Frame format', options: [{ label: 'CinemaScope', value: 'scope' }, { label: 'Widescreen', value: 'wide' }, { label: 'Academy', value: 'academy' }] } },
+      defaultProps: { image: '/images/photo-6.jpg', alt: 'Cinematic landscape in camera viewfinder', label: 'SHOT 08 · THE ARRIVAL', timecode: '01:24:08:12', lens: '35 MM · T2.8 · 24 FPS', format: 'scope' },
+      render: ({ image, alt, label, timecode, lens, format }) => <figure className={`builder-viewfinder builder-viewfinder--${format}`}><div><img src={image} alt={alt || ''} /><span className="builder-viewfinder__corners" aria-hidden="true" /><span className="builder-viewfinder__reticle" aria-hidden="true" /><b>REC ●</b><em>{timecode}</em></div><figcaption><span>{label}</span><span>{lens}</span></figcaption></figure>,
+    },
+    StoryboardBlock: {
+      label: 'Storyboard sequence',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Sequence title', contentEditable: true }, panels: { type: 'array', label: 'Storyboard panels', min: 2, max: 12, arrayFields: { image: imageField('Panel image'), alt: { type: 'text', label: 'Image description' }, shot: { type: 'text', label: 'Shot number' }, action: { type: 'textarea', label: 'Action / camera note' } }, defaultItemProps: (index) => ({ image: `/images/photo-${(index % 10) + 1}.jpg`, alt: 'Storyboard frame', shot: `${index + 1}A`, action: 'Describe the action and camera move.' }), getItemSummary: (item, index) => item.shot || `Panel ${(index || 0) + 1}` } },
+      defaultProps: { eyebrow: 'Sequence 03', title: 'The long way home', panels: [{ image: '/images/photo-7.jpg', alt: 'Wide establishing shot', shot: '03A · WS', action: 'Static. Hold for the figure to enter frame.' }, { image: '/images/photo-8.jpg', alt: 'Moving medium shot', shot: '03B · MS', action: 'Slow push. Subject turns toward the light.' }, { image: '/images/photo-9.jpg', alt: 'Close detail shot', shot: '03C · CU', action: 'Handheld detail. Cut on the sound cue.' }] },
+      render: ({ eyebrow, title, panels }) => <section className="builder-storyboard"><header><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2></header><div>{(panels || []).map((panel: { image: string; alt: string; shot: string; action: string }, index: number) => <figure key={`${panel.shot}-${index}`}><div><img src={panel.image} alt={panel.alt || ''} /><span>{String(index + 1).padStart(2, '0')}</span></div><figcaption><strong>{panel.shot}</strong><p>{panel.action}</p></figcaption></figure>)}</div></section>,
+    },
+    ReelShowcaseBlock: {
+      label: 'Showreel feature',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Reel title', contentEditable: true }, image: imageField('Poster image'), imageAlt: { type: 'text', label: 'Image description' }, url: { type: 'text', label: 'Reel link' }, duration: { type: 'text', label: 'Duration' }, year: { type: 'text', label: 'Year' }, roles: { type: 'text', label: 'Roles' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { eyebrow: 'New reel', title: 'CINEMATOGRAPHY / 2026', image: '/images/reel-cinematography.jpg', imageAlt: 'Cinematography showreel poster', url: '#', duration: '02:47', year: '2026', roles: 'NARRATIVE · COMMERCIAL · MUSIC', theme: 'black' },
+      render: ({ eyebrow, title, image, imageAlt, url, duration, year, roles, theme }) => <section className={`builder-reel-showcase builder-theme--${theme}`}><header><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2></header><a href={url}><div><img src={image} alt={imageAlt || ''} /><span className="builder-reel-showcase__play" aria-hidden="true">PLAY</span><i aria-hidden="true" /></div><footer><span>{roles}</span><span>{year}</span><span>{duration}</span></footer></a></section>,
+    },
+    ColorGradeBlock: {
+      label: 'Color grade triptych',
+      fields: { title: { type: 'text', label: 'Title', contentEditable: true }, image: imageField('Master image'), alt: { type: 'text', label: 'Image description' }, firstLabel: { type: 'text', label: 'First look' }, secondLabel: { type: 'text', label: 'Second look' }, thirdLabel: { type: 'text', label: 'Third look' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { title: 'Three ways to hold the night.', image: '/images/photo-10.jpg', alt: 'Night scene shown with three color grades', firstLabel: '01 · NEGATIVE', secondLabel: '02 · WORK PRINT', thirdLabel: '03 · FINAL GRADE', theme: 'paper' },
+      render: ({ title, image, alt, firstLabel, secondLabel, thirdLabel, theme }) => <section className={`builder-color-grade builder-theme--${theme}`}><h2>{title}</h2><div>{[firstLabel, secondLabel, thirdLabel].map((label, index) => <figure className={`builder-color-grade__look builder-color-grade__look--${index + 1}`} key={`${label}-${index}`}><img src={image} alt={index === 0 ? (alt || '') : ''} /><figcaption>{label}</figcaption></figure>)}</div></section>,
+    },
+    FilmStockBlock: {
+      label: 'Film stock details',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Title', contentEditable: true }, stock: { type: 'text', label: 'Stock name' }, format: { type: 'text', label: 'Format' }, speed: { type: 'text', label: 'Speed' }, process: { type: 'text', label: 'Process' }, note: { type: 'textarea', label: 'Creative note', contentEditable: true }, accent: colorField('Label color') },
+      defaultProps: { eyebrow: 'Capture notes', title: 'Built from grain, halation, and available light.', stock: 'VISION3 500T', format: '35 MM / 4 PERF', speed: 'EI 800', process: 'ECN-2 · +1 PUSH', note: 'Use this block for technical notes, equipment lists, or the small choices that shaped the image.', accent: '#f2c84b' },
+      render: ({ eyebrow, title, stock, format, speed, process, note, accent }) => <section className="builder-film-stock"><div className="builder-film-stock__can" style={{ '--stock-accent': accent } as CSSProperties}><div className="builder-film-stock__label"><span>35 MM</span><b>{stock}</b><small>MOTION PICTURE FILM</small></div><i aria-hidden="true" /></div><div className="builder-film-stock__copy"><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2><dl><div><dt>Stock</dt><dd>{stock}</dd></div><div><dt>Format</dt><dd>{format}</dd></div><div><dt>Exposure</dt><dd>{speed}</dd></div><div><dt>Process</dt><dd>{process}</dd></div></dl><p>{note}</p></div></section>,
+    },
+    EndCreditsBlock: {
+      label: 'End credits',
+      fields: { title: { type: 'text', label: 'Closing title', contentEditable: true }, subtitle: { type: 'text', label: 'Subtitle', contentEditable: true }, align: { type: 'radio', label: 'Alignment', options: alignOptions }, credits: { type: 'array', label: 'Credits', min: 2, max: 30, arrayFields: { role: { type: 'text', label: 'Role' }, name: { type: 'text', label: 'Name' } }, defaultItemProps: (index) => ({ role: `ROLE ${index + 1}`, name: 'COLLABORATOR NAME' }), getItemSummary: (item, index) => item.role || `Credit ${(index || 0) + 1}` } },
+      defaultProps: { title: 'THE END', subtitle: 'A FILM BY YOUR STUDIO', align: 'center', credits: [{ role: 'DIRECTOR', name: 'YOUR NAME' }, { role: 'CINEMATOGRAPHER', name: 'COLLABORATOR NAME' }, { role: 'EDITOR', name: 'COLLABORATOR NAME' }, { role: 'COLORIST', name: 'COLLABORATOR NAME' }, { role: 'MUSIC', name: 'ORIGINAL SCORE' }] },
+      render: ({ title, subtitle, align, credits }) => <section className={`builder-end-credits builder-end-credits--${align}`}><p>{subtitle}</p><h2>{title}</h2><dl>{(credits || []).map((credit: { role: string; name: string }, index: number) => <div key={`${credit.role}-${index}`}><dt>{credit.role}</dt><dd>{credit.name}</dd></div>)}</dl><span aria-hidden="true">●</span></section>,
     },
     CalendlyBlock: {
       label: 'Calendly scheduling',

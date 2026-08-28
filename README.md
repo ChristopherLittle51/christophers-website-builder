@@ -7,8 +7,8 @@ It is a normal Next.js application—not a hosted-platform project. Run it on a 
 ## What is included
 
 - Mobile-first drag-and-drop editing powered by [Puck](https://puckeditor.com/).
-- Four neutral starter templates: multidisciplinary portfolio, minimal work index, project case study, and expressive studio.
-- Twenty-six blocks spanning primitives, layouts, galleries, storytelling, media, and integrations.
+- Five starter templates, including a complete Director’s treatment for photography and moving image.
+- Thirty-six blocks spanning primitives, layouts, galleries, storytelling, media, integrations, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
 - Recursive nested containers with one to four columns and container-query reflow.
 - Expandable image grids with editorial, uniform, and filmstrip layouts.
 - Per-field and global font control using nine bundled open-source font families.
