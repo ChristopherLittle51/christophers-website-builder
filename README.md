@@ -16,6 +16,7 @@ It is a normal Next.js application—not a hosted-platform project. Run it on a 
 - Image uploads plus seekable MP4/WebM video hosting with HTTP range responses.
 - YouTube/Vimeo, Calendly, and sandboxed HTML/CSS/JavaScript blocks.
 - Draft autosave with explicit publishing, so experiments do not immediately change the public site.
+- Editable section link names, so links such as `#photography` scroll visitors to a chosen block.
 - Password-protected editor sessions signed with HMAC.
 - Filesystem and S3-compatible storage drivers.
 - Production Docker image and Compose setup.
@@ -110,6 +111,7 @@ The main registry is `lib/site-builder.tsx`.
 - Primitives: heading, paragraph, eyebrow, image, button, divider, spacer.
 - Layouts: recursive 1–4 column container, editorial hero, split feature, text section.
 - Galleries: expandable grid, project cards, six-image gallery, before/after comparison.
+- Navigation: editable header/link bar and grouped footer/site map.
 - Storytelling: sticky story, process timeline, pull quote, marquee, link list, stats, credits, contact.
 - Media and integrations: uploaded/embedded video, Calendly, sandboxed custom HTML/CSS/JS.
 
@@ -132,8 +134,10 @@ Project map:
 - `lib/storage.ts`: filesystem/S3 persistence boundary.
 - `lib/auth.ts`: signed editor sessions and password verification.
 - `lib/puck-data.ts`: recursive component identity normalization.
+- `docs/SECTION_LINKS.md`: editable block anchors and authoring contract.
 - `lib/media.ts`: upload rules and HTTP byte-range parsing.
 - `docs/ARCHITECTURE.md`: contracts and extension points.
+- `docs/NAVIGATION_COMPONENTS.md`: header/link bar and footer/site map field contracts.
 - `docs/OPERATIONS.md`: deployment, backup, restore, and upgrade guide.
 
 ## Current scope

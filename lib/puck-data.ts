@@ -8,6 +8,21 @@ export type NormalizedBuilderData = {
   repairedIds: number;
 };
 
+function slugifyAnchorName(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80);
+}
+
+function generatedAnchorName(component: ComponentLike, id: string) {
+  return `generated-${slugifyAnchorName(component.type)}-${stableHash(`${component.type}|${id}`)}`;
+}
+
 function isComponent(value: unknown): value is ComponentLike {
   if (!value || typeof value !== 'object') return false;
   const candidate = value as { type?: unknown; props?: unknown };
@@ -33,7 +48,9 @@ function stableHash(value: string) {
 export function normalizeBuilderData(input: Data): NormalizedBuilderData {
   const data = JSON.parse(JSON.stringify(input)) as Data;
   const usedIds = new Set<string>();
+  const usedAnchorNames = new Set<string>();
   let repairedIds = 0;
+  let repairedNames = 0;
 
   const allocateId = (component: ComponentLike, path: string) => {
     const current = typeof component.props.id === 'string' ? component.props.id.trim() : '';
@@ -55,8 +72,25 @@ export function normalizeBuilderData(input: Data): NormalizedBuilderData {
     repairedIds += 1;
   };
 
+  const allocateAnchorName = (component: ComponentLike, path: string) => {
+    const current = typeof component.props.name === 'string' ? slugifyAnchorName(component.props.name) : '';
+    const base = current || generatedAnchorName(component, typeof component.props.id === 'string' ? component.props.id : path);
+    let nextName = base;
+    let attempt = 1;
+    while (usedAnchorNames.has(nextName)) {
+      attempt += 1;
+      nextName = `${base}-${attempt}`;
+    }
+    if (component.props.name !== nextName) {
+      component.props.name = nextName;
+      repairedNames += 1;
+    }
+    usedAnchorNames.add(nextName);
+  };
+
   const walkComponent = (component: ComponentLike, path: string) => {
     allocateId(component, path);
+    allocateAnchorName(component, path);
     walkSlotValues(component.props, `${path}.props`);
   };
 
@@ -84,5 +118,5 @@ export function normalizeBuilderData(input: Data): NormalizedBuilderData {
     });
   }
 
-  return { data, changed: repairedIds > 0, repairedIds };
+  return { data, changed: repairedIds > 0 || repairedNames > 0, repairedIds };
 }

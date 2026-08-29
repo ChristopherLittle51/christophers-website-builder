@@ -1,8 +1,8 @@
 'use client';
 
 import type { Config, CustomFieldRender } from '@puckeditor/core';
-import type { CSSProperties, ReactNode } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
+import { cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 import { buildCalendlyEmbedUrl } from './embed-utils';
 
 declare global {
@@ -66,11 +66,24 @@ const trackingOptions = [{ label: 'Tight', value: 'tight' }, { label: 'Natural',
 const themeOptions = [{ label: 'Paper', value: 'paper' }, { label: 'Black', value: 'black' }, { label: 'Accent', value: 'lime' }];
 const embedHeights: Record<string, number> = { compact: 540, standard: 700, tall: 860 };
 const nestedAllowlist = [
-  'LayoutContainer', 'EditorialHero', 'SplitFeature', 'TextBlock', 'ImageBlock', 'ButtonBlock', 'ExpandableGrid', 'ProjectGrid', 'GalleryBlock',
+  'HeaderLinkBar', 'FooterSitemap', 'LayoutContainer', 'EditorialHero', 'SplitFeature', 'TextBlock', 'ImageBlock', 'ButtonBlock', 'ExpandableGrid', 'ProjectGrid', 'GalleryBlock',
   'BeforeAfter', 'StickyStory', 'TimelineBlock', 'MarqueeBlock', 'ContactBlock', 'HeadingBlock', 'ParagraphBlock', 'EyebrowBlock', 'DividerBlock',
   'SpacerBlock', 'QuoteBlock', 'VideoBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'CalendlyBlock', 'CustomCodeBlock',
 ];
 const typeClass = (prefix: string, size = 'standard', tracking = 'tight') => `${prefix} ${prefix}--size-${size} ${prefix}--tracking-${tracking}`;
+const sectionNameField = { type: 'text' as const, label: 'Section link name', description: 'Use this name in links like #photography.' };
+
+// Add the anchor to the block's existing root element so it does not introduce
+// a layout wrapper around blocks that participate in grids or flex layouts.
+function withSectionAnchor(render: (props: any) => ReactNode): any {
+  return (props: any) => {
+    const rendered = render(props);
+    if (!isValidElement(rendered)) return rendered;
+    const name = typeof props.name === 'string' ? props.name.trim() : '';
+    const id = name || (typeof props.id === 'string' ? props.id : undefined);
+    return cloneElement(rendered as ReactElement<any>, id ? { id } : undefined);
+  };
+}
 
 function BeforeAfterView({ before, after, beforeAlt, afterAlt, label }: { before: string; after: string; beforeAlt: string; afterAlt: string; label: ReactNode }) {
   const [position, setPosition] = useState(50);
@@ -197,6 +210,7 @@ function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const builderConfig: Config<any> = {
   categories: {
+    navigation: { title: 'Navigation', components: ['HeaderLinkBar', 'FooterSitemap'], defaultExpanded: true },
     primitives: { title: 'Building blocks', components: ['HeadingBlock', 'ParagraphBlock', 'EyebrowBlock', 'ImageBlock', 'ButtonBlock', 'DividerBlock', 'SpacerBlock'], defaultExpanded: true },
     layout: { title: 'Layouts & sections', components: ['LayoutContainer', 'EditorialHero', 'SplitFeature', 'TextBlock'], defaultExpanded: true },
     cinema: { title: 'Photo & cinema', components: ['FilmStripBlock', 'ContactSheetBlock', 'DirectorsSlateBlock', 'LensHeroBlock', 'ViewfinderBlock', 'StoryboardBlock', 'ReelShowcaseBlock', 'ColorGradeBlock', 'FilmStockBlock', 'EndCreditsBlock'], defaultExpanded: true },
@@ -205,6 +219,38 @@ export const builderConfig: Config<any> = {
     integrations: { title: 'Embeds & integrations', components: ['CalendlyBlock', 'CustomCodeBlock'], defaultExpanded: true },
   },
   components: {
+    HeaderLinkBar: {
+      label: 'Header / link bar',
+      fields: {
+        brand: { type: 'text', label: 'Brand name', contentEditable: true },
+        brandUrl: { type: 'text', label: 'Brand link' },
+        links: { type: 'array', label: 'Navigation links', min: 1, max: 8, arrayFields: { label: { type: 'text', label: 'Label' }, url: { type: 'text', label: 'URL or #anchor' } }, defaultItemProps: (index) => ({ label: `Section ${index + 1}`, url: '#' }), getItemSummary: (item, index) => item.label || `Link ${(index || 0) + 1}` },
+        theme: { type: 'radio', label: 'Theme', options: themeOptions },
+      },
+      defaultProps: { brand: 'Studio Name', brandUrl: '#', links: [{ label: 'Work', url: '#work' }, { label: 'About', url: '#about' }, { label: 'Contact', url: '#contact' }], theme: 'paper' },
+      render: ({ brand, brandUrl, links, theme }) => <header className={`builder-header-bar builder-theme--${theme}`}><a className="builder-header-bar__brand" href={brandUrl || '#'}>{brand}</a><nav aria-label="Primary navigation">{(links || []).map((link: { label: string; url: string }, index: number) => <a href={link.url || '#'} key={`${link.label}-${index}`}>{link.label}</a>)}</nav></header>,
+    },
+    FooterSitemap: {
+      label: 'Footer / site map',
+      fields: {
+        eyebrow: { type: 'text', label: 'Small intro', contentEditable: true },
+        brand: { type: 'text', label: 'Brand name', contentEditable: true },
+        note: { type: 'textarea', label: 'Footer note', contentEditable: true },
+        email: { type: 'text', label: 'Email address' },
+        copyright: { type: 'text', label: 'Copyright line', contentEditable: true },
+        theme: { type: 'radio', label: 'Theme', options: themeOptions },
+        links: { type: 'array', label: 'Site map links', min: 1, max: 24, arrayFields: { section: { type: 'text', label: 'Group' }, label: { type: 'text', label: 'Label' }, url: { type: 'text', label: 'URL or #anchor' } }, defaultItemProps: (index) => ({ section: index < 3 ? 'Explore' : 'Connect', label: `Page ${index + 1}`, url: '#' }), getItemSummary: (item, index) => `${item.section || 'Links'} · ${item.label || `Link ${(index || 0) + 1}`}` },
+      },
+      defaultProps: { eyebrow: 'Stay in the loop', brand: 'Studio Name', note: 'Independent creative practice for images, stories, and ideas with a point of view.', email: 'hello@example.com', copyright: '© 2026 Studio Name', theme: 'black', links: [{ section: 'Explore', label: 'Work', url: '#work' }, { section: 'Explore', label: 'About', url: '#about' }, { section: 'Explore', label: 'Process', url: '#process' }, { section: 'Connect', label: 'Email', url: 'mailto:hello@example.com' }, { section: 'Connect', label: 'Instagram', url: '#' }] },
+      render: ({ eyebrow, brand, note, email, copyright, theme, links }) => {
+        const groups = (links || []).reduce((result: Record<string, { label: string; url: string }[]>, link: { section: string; label: string; url: string }) => {
+          const section = link.section || 'Links';
+          (result[section] ||= []).push(link);
+          return result;
+        }, {});
+        return <footer className={`builder-footer-sitemap builder-theme--${theme}`}><div className="builder-footer-sitemap__intro"><p className="builder-kicker">{eyebrow}</p><p className="builder-footer-sitemap__brand">{brand}</p><p className="builder-footer-sitemap__note">{note}</p><a href={`mailto:${email}`}>{email} ↗</a></div><nav className="builder-footer-sitemap__links" aria-label="Site map">{(Object.entries(groups) as [string, { label: string; url: string }[]][]).map(([section, sectionLinks]) => <div key={section}><p>{section}</p>{sectionLinks.map((link, index) => <a href={link.url || '#'} key={`${link.label}-${index}`}>{link.label}<span aria-hidden="true">↗</span></a>)}</div>)}</nav><div className="builder-footer-sitemap__legal"><span>{copyright}</span><span>Built with Open Canvas</span></div></footer>;
+      },
+    },
     EditorialHero: {
       label: 'Editorial hero',
       fields: {
@@ -474,5 +520,13 @@ export const builderConfig: Config<any> = {
     },
   },
 };
+
+// Keep the section-name control and anchor behavior consistent across every
+// current and future block registered above. Root settings are intentionally
+// excluded because the root is the page canvas, not a linkable section.
+for (const component of Object.values(builderConfig.components)) {
+  component.fields = { name: sectionNameField, ...component.fields };
+  component.render = withSectionAnchor(component.render);
+}
 
 export { starterData } from './templates';

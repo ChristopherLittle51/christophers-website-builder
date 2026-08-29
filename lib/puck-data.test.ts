@@ -61,3 +61,23 @@ test('enforces one identity space across root content and legacy zones', () => {
   assert.equal(result.repairedIds, 1);
   assert.equal(new Set(ids).size, 2);
 });
+
+test('generates valid unique anchor names and normalizes edited names', () => {
+  const data = {
+    root: { props: {} },
+    content: [
+      { type: 'TextBlock', props: { id: 'intro', name: 'Photography & Film' } },
+      { type: 'ImageBlock', props: { id: 'image', name: 'Photography & Film' } },
+      { type: 'ParagraphBlock', props: { id: 'missing-name' } },
+    ],
+    zones: {},
+  } as unknown as Data;
+
+  const result = normalizeBuilderData(data);
+  const components = result.data.content as Array<{ props: Record<string, unknown> }>;
+  assert.equal(components[0].props.name, 'photography-film');
+  assert.equal(components[1].props.name, 'photography-film-2');
+  assert.match(String(components[2].props.name), /^generated-paragraphblock-[a-z0-9]+$/);
+  assert.equal(result.changed, true);
+  assert.equal(normalizeBuilderData(result.data).changed, false);
+});
