@@ -269,7 +269,7 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 .builder-container--align-end { align-items: end; }
 .builder-container--align-stretch { align-items: stretch; }
 .builder-container__cell { container-type: inline-size; min-width: 0; }
-.builder-container__cell .builder-text,.builder-container__cell .builder-image,.builder-container__cell .builder-button,.builder-container__cell .builder-timeline,.builder-container__cell .builder-compare,.builder-container__cell .builder-heading,.builder-container__cell .builder-paragraph,.builder-container__cell .builder-eyebrow,.builder-container__cell .builder-divider,.builder-container__cell .builder-video,.builder-container__cell .builder-link-list,.builder-container__cell .builder-stats,.builder-container__cell .builder-credits,.builder-container__cell .builder-calendly,.builder-container__cell .builder-code { padding-left: 0; padding-right: 0; }
+.builder-container__cell .builder-text,.builder-container__cell .builder-image,.builder-container__cell .builder-button,.builder-container__cell .builder-timeline,.builder-container__cell .builder-compare,.builder-container__cell .builder-heading,.builder-container__cell .builder-paragraph,.builder-container__cell .builder-eyebrow,.builder-container__cell .builder-divider,.builder-container__cell .builder-video,.builder-container__cell .builder-link-list,.builder-container__cell .builder-stats,.builder-container__cell .builder-credits,.builder-container__cell .builder-calendly,.builder-container__cell .builder-github,.builder-container__cell .builder-code { padding-left: 0; padding-right: 0; }
 
 /* Small primitives are the preferred ingredients for custom nested layouts. */
 .builder-heading { font-family: var(--font-display); font-size: clamp(38px,10vw,82px); letter-spacing: -.06em; line-height: .92; margin: 0; padding: 28px 18px; white-space: pre-line; }
@@ -323,6 +323,24 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 .builder-calendly__widget,.builder-calendly__widget iframe { height: 100% !important; min-width: 0 !important; width: 100% !important; }
 .builder-calendly__empty { border: 1px dashed currentColor; display: grid; min-height: 280px; opacity: .65; padding: 24px; place-items: center; text-align: center; }
 .builder-calendly__fallback { align-items: center; background: var(--site-accent,#d8ff00); color: var(--site-ink,#050505); display: flex; inset: 0; justify-content: center; padding: 24px; position: absolute; text-transform: uppercase; }
+.builder-github { background: var(--block-bg); color: var(--block-ink); padding: 68px 18px; position: relative; }
+.builder-github__topline,.builder-github__heading { align-items: baseline; display: flex; justify-content: space-between; }
+.builder-github__topline { border-bottom: 1px solid currentColor; padding-bottom: 12px; }
+.builder-github__topline .builder-kicker { margin: 0 !important; }
+.builder-github__topline > span { font-size: 20px; }
+.builder-github__heading { gap: 20px; padding: 24px 0 18px; }
+.builder-github__heading h2 { font-family: var(--font-display); font-size: clamp(36px,9vw,86px); letter-spacing: -.07em; line-height: .9; margin: 0; overflow-wrap: anywhere; }
+.builder-github__heading a { border-bottom: 1px solid currentColor; flex: 0 0 auto; font-size: 10px; letter-spacing: .08em; padding-bottom: 6px; text-transform: uppercase; }
+.builder-github__description { font-family: var(--font-accent,var(--font-body)); font-size: clamp(20px,4vw,30px); letter-spacing: -.03em; line-height: 1.1; margin: 0; max-width: 34ch; }
+.builder-github__stats { border-top: 1px solid currentColor; display: grid; gap: 0 18px; grid-template-columns: repeat(2,minmax(0,1fr)); margin: 42px 0 0; }
+.builder-github__stats div { border-bottom: 1px solid currentColor; display: flex; flex-direction: column-reverse; gap: 8px; min-width: 0; padding: 14px 0 18px; }
+.builder-github__stats dt { font-size: 9px; letter-spacing: .1em; opacity: .65; text-transform: uppercase; }
+.builder-github__stats dd { font-family: var(--font-display); font-size: clamp(26px,7vw,54px); letter-spacing: -.06em; line-height: .9; margin: 0; overflow-wrap: anywhere; }
+.builder-github__topics { display: flex; flex-wrap: wrap; gap: 7px; list-style: none; margin: 24px 0 0; padding: 0; }
+.builder-github__topics li,.builder-github__license { border: 1px solid currentColor; font-size: 10px; letter-spacing: .06em; padding: 7px 9px; text-transform: uppercase; }
+.builder-github__license { display: inline-block; margin: 24px 0 0; opacity: .7; }
+.builder-github__message { border: 1px dashed currentColor; margin-top: 24px; opacity: .7; padding: 22px; text-align: center; }
+.builder-github__message--error { color: #a52222; opacity: 1; }
 .builder-code { padding: 18px; }
 .builder-code--bleed { padding: 0; }
 .builder-code__stage { background: #050505; overflow: hidden; position: relative; }
@@ -552,7 +570,7 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
   .builder-sticky__image { align-self: start; position: sticky; top: 20px; }
   .builder-sticky__copy { align-self: center; min-height: 110vh; padding: 30vh 0; }
   .builder-timeline li { align-items: baseline; gap: 24px; grid-template-columns: 70px minmax(180px,.8fr) 1fr; }
-  .builder-heading,.builder-paragraph,.builder-eyebrow,.builder-video,.builder-link-list,.builder-stats,.builder-credits,.builder-calendly { padding-left: 4vw; padding-right: 4vw; }
+  .builder-heading,.builder-paragraph,.builder-eyebrow,.builder-video,.builder-link-list,.builder-stats,.builder-credits,.builder-calendly,.builder-github { padding-left: 4vw; padding-right: 4vw; }
   .builder-calendly header { align-items: end; grid-template-columns: 1.2fr .8fr; }
   .builder-calendly header .builder-kicker { grid-column: 1 / -1; }
   .builder-code { padding: 4vw; }

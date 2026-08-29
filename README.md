@@ -8,13 +8,13 @@ It is a normal Next.js application—not a hosted-platform project. Run it on a 
 
 - Mobile-first drag-and-drop editing powered by [Puck](https://puckeditor.com/).
 - Five starter templates, including a complete Director’s treatment for photography and moving image.
-- Thirty-six blocks spanning primitives, layouts, galleries, storytelling, media, integrations, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
+- Thirty-seven blocks spanning primitives, layouts, galleries, storytelling, media, integrations, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
 - Recursive nested containers with one to four columns and container-query reflow.
 - Expandable image grids with editorial, uniform, and filmstrip layouts.
 - Per-field and global font control using nine bundled open-source font families.
 - Custom colors, content widths, corner styles, favicon, Open Graph image, and social copy.
 - Image uploads plus seekable MP4/WebM video hosting with HTTP range responses.
-- YouTube/Vimeo, Calendly, and sandboxed HTML/CSS/JavaScript blocks.
+- YouTube/Vimeo, Calendly, GitHub repository metadata, and sandboxed HTML/CSS/JavaScript blocks.
 - Draft autosave with explicit publishing, so experiments do not immediately change the public site.
 - Editable section link names, so links such as `#photography` scroll visitors to a chosen block.
 - Password-protected editor sessions signed with HMAC.
@@ -113,7 +113,7 @@ The main registry is `lib/site-builder.tsx`.
 - Galleries: expandable grid, project cards, six-image gallery, before/after comparison.
 - Navigation: editable header/link bar and grouped footer/site map.
 - Storytelling: sticky story, process timeline, pull quote, marquee, link list, stats, credits, contact.
-- Media and integrations: uploaded/embedded video, Calendly, sandboxed custom HTML/CSS/JS.
+- Media and integrations: uploaded/embedded video, Calendly, public GitHub repository metadata, sandboxed custom HTML/CSS/JS.
 
 Templates are ordinary Puck JSON in `lib/templates.ts`. A new template must use registered component names and globally unique IDs. New component types should be added to `nestedAllowlist` so they can be used inside containers.
 
@@ -138,6 +138,7 @@ Project map:
 - `lib/media.ts`: upload rules and HTTP byte-range parsing.
 - `docs/ARCHITECTURE.md`: contracts and extension points.
 - `docs/NAVIGATION_COMPONENTS.md`: header/link bar and footer/site map field contracts.
+- `docs/GITHUB_REPOSITORY_BLOCK.md`: GitHub repository block data and authoring contract.
 - `docs/OPERATIONS.md`: deployment, backup, restore, and upgrade guide.
 
 ## Current scope

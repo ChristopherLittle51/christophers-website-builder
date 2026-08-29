@@ -4,6 +4,7 @@ import type { Config, CustomFieldRender } from '@puckeditor/core';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 import { buildCalendlyEmbedUrl } from './embed-utils';
+import { formatGitHubCount, formatGitHubDate, parseGitHubRepository } from './github';
 
 declare global {
   interface Window {
@@ -155,6 +156,60 @@ function CalendlyWidget({ url, height, isEditing }: { url: string; height: numbe
   </div>;
 }
 
+type GitHubRepository = {
+  name: string;
+  html_url: string;
+  description: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  watchers_count: number;
+  open_issues_count: number;
+  language: string | null;
+  license: { spdx_id: string | null; name: string } | null;
+  topics?: string[];
+  updated_at: string | null;
+};
+
+function GitHubRepositoryView({ repoUrl, title, description, stats, topics, theme, isEditing }: { repoUrl: string; title: string; description: string; stats: string; topics: string; theme: string; isEditing: boolean }) {
+  const [repository, setRepository] = useState<GitHubRepository | null>(null);
+  const [state, setState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [error, setError] = useState('');
+  const parsed = parseGitHubRepository(repoUrl || '');
+
+  useEffect(() => {
+    if (!parsed) {
+      setRepository(null);
+      setState('idle');
+      setError('');
+      return;
+    }
+    const controller = new AbortController();
+    setState('loading');
+    setError('');
+    fetch(`https://api.github.com/repos/${encodeURIComponent(parsed.owner)}/${encodeURIComponent(parsed.repo)}`, { headers: { Accept: 'application/vnd.github+json' }, signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(response.status === 403 ? 'GitHub rate limit reached. Try again later.' : response.status === 404 ? 'Repository not found or not public.' : 'GitHub could not load this repository.');
+        return response.json() as Promise<GitHubRepository>;
+      })
+      .then((result) => { setRepository(result); setState('ready'); })
+      .catch((fetchError: unknown) => { if (fetchError instanceof DOMException && fetchError.name === 'AbortError') return; setRepository(null); setState('error'); setError(fetchError instanceof Error ? fetchError.message : 'GitHub could not load this repository.'); });
+    return () => controller.abort();
+  }, [parsed?.owner, parsed?.repo]);
+
+  const heading = title || repository?.name || (parsed ? `${parsed.owner}/${parsed.repo}` : 'GitHub repository');
+  return <section className={`builder-github builder-theme--${theme}`}>
+    <div className="builder-github__topline"><p className="builder-kicker">GitHub repository</p><span aria-hidden="true">◈</span></div>
+    <div className="builder-github__heading"><h2>{heading}</h2>{repository?.html_url ? <a href={repository.html_url} target="_blank" rel="noreferrer">View on GitHub ↗</a> : null}</div>
+    {!parsed ? <div className="builder-github__message">Add a public GitHub repository URL in the sidebar to connect this block.</div> : state === 'loading' ? <div className="builder-github__message" role="status">Reading repository details…</div> : state === 'error' ? <div className="builder-github__message builder-github__message--error" role="alert">{error}</div> : repository ? <>
+      {description !== 'hide' ? <p className="builder-github__description">{repository.description || 'No repository description yet.'}</p> : null}
+      {stats !== 'hide' ? <dl className="builder-github__stats"><div><dt>Stars</dt><dd>{formatGitHubCount(repository.stargazers_count)}</dd></div><div><dt>Forks</dt><dd>{formatGitHubCount(repository.forks_count)}</dd></div><div><dt>Issues</dt><dd>{formatGitHubCount(repository.open_issues_count)}</dd></div><div><dt>Watchers</dt><dd>{formatGitHubCount(repository.watchers_count)}</dd></div><div><dt>Language</dt><dd>{repository.language || '—'}</dd></div><div><dt>Updated</dt><dd>{formatGitHubDate(repository.updated_at)}</dd></div></dl> : null}
+      {topics !== 'hide' && repository.topics?.length ? <ul className="builder-github__topics" aria-label="Repository topics">{repository.topics.slice(0, 8).map((topic) => <li key={topic}>#{topic}</li>)}</ul> : null}
+      {repository.license ? <p className="builder-github__license">{repository.license.spdx_id || repository.license.name}</p> : null}
+    </> : null}
+    {isEditing ? <span className="builder-embed-stage__label">Live GitHub data · edit from the sidebar</span> : null}
+  </section>;
+}
+
 type FilmStripFrame = { image: string; alt: string; caption: string };
 
 function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: { title: ReactNode; stock: ReactNode; direction: string; frames: FilmStripFrame[]; theme: string; isEditing: boolean }) {
@@ -216,7 +271,7 @@ export const builderConfig: Config<any> = {
     cinema: { title: 'Photo & cinema', components: ['FilmStripBlock', 'ContactSheetBlock', 'DirectorsSlateBlock', 'LensHeroBlock', 'ViewfinderBlock', 'StoryboardBlock', 'ReelShowcaseBlock', 'ColorGradeBlock', 'FilmStockBlock', 'EndCreditsBlock'], defaultExpanded: true },
     galleries: { title: 'Images & work', components: ['ExpandableGrid', 'ProjectGrid', 'GalleryBlock', 'ImageBlock', 'BeforeAfter'], defaultExpanded: true },
     storytelling: { title: 'Storytelling', components: ['StickyStory', 'TimelineBlock', 'QuoteBlock', 'VideoBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'MarqueeBlock', 'ContactBlock'], defaultExpanded: true },
-    integrations: { title: 'Embeds & integrations', components: ['CalendlyBlock', 'CustomCodeBlock'], defaultExpanded: true },
+    integrations: { title: 'Embeds & integrations', components: ['GitHubRepositoryBlock', 'CalendlyBlock', 'CustomCodeBlock'], defaultExpanded: true },
   },
   components: {
     HeaderLinkBar: {
@@ -478,6 +533,15 @@ export const builderConfig: Config<any> = {
         const url = buildCalendlyEmbedUrl(schedulingUrl || '', { backgroundColor, textColor, primaryColor, hideDetails: hideDetails === 'hide' });
         return <section className="builder-calendly" style={{ backgroundColor, color: textColor }}><header><p className="builder-kicker">{eyebrow}</p><h2 style={fontStyle(titleFont)}>{title}</h2><p style={fontStyle(introFont)}>{intro}</p></header>{url ? <CalendlyWidget url={url} height={embedHeights[height] || embedHeights.standard} isEditing={Boolean(puck?.isEditing)} /> : <div className="builder-calendly__empty">Add a Calendly scheduling link in the sidebar to show the calendar.</div>}</section>;
       },
+    },
+    GitHubRepositoryBlock: {
+      label: 'GitHub repository',
+      fields: {
+        repoUrl: { type: 'text', label: 'GitHub repository URL' }, title: { type: 'text', label: 'Display heading', contentEditable: true },
+        description: { type: 'radio', label: 'Description', options: [{ label: 'Show', value: 'show' }, { label: 'Hide', value: 'hide' }] }, stats: { type: 'radio', label: 'Repository statistics', options: [{ label: 'Show', value: 'show' }, { label: 'Hide', value: 'hide' }] }, topics: { type: 'radio', label: 'Topics', options: [{ label: 'Show', value: 'show' }, { label: 'Hide', value: 'hide' }] }, theme: { type: 'radio', label: 'Theme', options: themeOptions },
+      },
+      defaultProps: { repoUrl: '', title: '', description: 'show', stats: 'show', topics: 'show', theme: 'black' },
+      render: ({ repoUrl, title, description, stats, topics, theme, puck }) => <GitHubRepositoryView repoUrl={repoUrl || ''} title={title || ''} description={description || 'show'} stats={stats || 'show'} topics={topics || 'show'} theme={theme || 'black'} isEditing={Boolean(puck?.isEditing)} />,
     },
     CustomCodeBlock: {
       label: 'Custom HTML / JS',
