@@ -6,7 +6,7 @@
 2. Set a strong `ADMIN_PASSWORD` in the platform secret manager.
 3. Set `SITE_URL` to the final HTTPS origin.
 4. Choose persistent filesystem storage or configure S3-compatible storage.
-5. Put TLS in front of the Node process and forward the original host and protocol correctly.
+5. Put TLS in front of the Node process and forward `X-Forwarded-Proto: https`. Editor redirects are origin-relative, so the same container supports direct LAN HTTP and HTTPS through a proxy. With the default `COOKIE_SECURE=auto`, session cookies are Secure only for HTTPS requests; set `COOKIE_SECURE=false` only to force non-Secure cookies everywhere.
 6. Build with `npm run build` and start with `npm start`, or use the Docker image.
 7. Sign in, upload a small image, save a draft, publish, and verify the public page in a private browser window.
 

@@ -82,6 +82,7 @@ Deploy the Node server anywhere that supports a persistent process and environme
 | `AUTH_SECRET` | Production | At least 32 characters; signs editor sessions. |
 | `ADMIN_PASSWORD` | Production | Password used at `/login`. Store it only in the host's secret manager. |
 | `SITE_URL` | Recommended | Public origin used by metadata, for example `https://portfolio.example.com`. |
+| `COOKIE_SECURE` | No | `auto` (default) supports LAN HTTP and marks sessions Secure for HTTPS requests, including TLS proxies that send `X-Forwarded-Proto`. Use `false` only to force non-Secure cookies everywhere. |
 | `STORAGE_DRIVER` | No | `filesystem` (default) or `s3`. |
 | `DATA_DIR` | Filesystem only | Persistent directory; defaults to `./data`. |
 | `S3_BUCKET` | S3 only | Object-storage bucket. |

@@ -50,10 +50,21 @@ export function verifyAdminPassword(candidate: string) {
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
-export function sessionCookie(token: string) {
-  return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+function shouldUseSecureCookie(request: Request) {
+  const configured = process.env.COOKIE_SECURE?.trim().toLowerCase();
+  if (configured === 'true') return true;
+  if (configured === 'false') return false;
+
+  // Proxies commonly terminate TLS before forwarding over HTTP. Prefer the
+  // original scheme when one is supplied, otherwise use the request URL.
+  const forwardedProtocol = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
+  return forwardedProtocol ? forwardedProtocol === 'https' : new URL(request.url).protocol === 'https:';
 }
 
-export function expiredSessionCookie() {
-  return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+export function sessionCookie(token: string, request: Request) {
+  return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}${shouldUseSecureCookie(request) ? '; Secure' : ''}`;
+}
+
+export function expiredSessionCookie(request: Request) {
+  return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${shouldUseSecureCookie(request) ? '; Secure' : ''}`;
 }
