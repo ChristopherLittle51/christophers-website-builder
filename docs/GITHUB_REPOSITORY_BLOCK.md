@@ -11,6 +11,7 @@ The block displays the repository description, stars, forks, open issues, watche
 - Invalid, missing, private, deleted, or rate-limited repositories render an explanatory inline message rather than an empty block.
 - Requests are cancelled when the URL changes or the component unmounts.
 - The block uses the existing `paper`, `black`, and `lime` theme tokens and is allowed inside nested layout containers.
+- New blocks must be added to `nestedAllowlist` in `lib/site-builder.tsx` as well as the editor category; this block is already included there.
 
 ## Verification
 
