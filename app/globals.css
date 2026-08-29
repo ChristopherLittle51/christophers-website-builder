@@ -532,7 +532,7 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 .builder-end-credits--right dl { margin-right: 0; }
 
 @media (min-width: 700px) {
-  .builder-header-bar { align-items: center; display: flex; padding: 20px 4vw; }
+  .builder-header-bar { align-items: center; display: flex; justify-content: space-between; padding: 20px 4vw; }
   .builder-header-bar__brand { flex: 0 1 48%; font-size: clamp(19px,2.2vw,30px); }
   .builder-header-bar nav { flex: 0 1 auto; width: auto; }
   .builder-header-bar nav { gap: 28px; }
