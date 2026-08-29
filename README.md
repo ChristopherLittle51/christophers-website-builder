@@ -130,6 +130,8 @@ Project map:
 
 - `app/`: public renderer, protected editor, auth, content, and media routes.
 - `lib/site-builder.tsx`: Puck component and root settings registry.
+
+Image-bearing components expose a nine-position focal-point control; see [docs/IMAGE_CROPPING.md](docs/IMAGE_CROPPING.md) for the saved-data contract and extension rules.
 - `lib/templates.ts`: generic starter documents.
 - `lib/storage.ts`: filesystem/S3 persistence boundary.
 - `lib/auth.ts`: signed editor sessions and password verification.
