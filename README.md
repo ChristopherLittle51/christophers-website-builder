@@ -1,6 +1,6 @@
-# Open Canvas Builder
+# christopher's website builder
 
-Open Canvas is an open-source, self-hostable visual website builder for creative professionals. It keeps the focused, art-directed feel of a custom portfolio while giving a nontechnical editor control over layout, typography, color, images, video, links, scheduling, and selected custom code.
+christopher's website builder is an open-source, self-hostable visual website builder for creative professionals. It keeps the focused, art-directed feel of a custom portfolio while giving a nontechnical editor control over layout, typography, color, images, video, links, scheduling, and selected custom code.
 
 It is a normal Next.js application—not a hosted-platform project. Run it on a laptop, in Docker, on a VM, or on any Node-compatible cloud. Content and uploads can live on the local filesystem or in any S3-compatible object store.
 
@@ -130,6 +130,8 @@ Project map:
 
 - `app/`: public renderer, protected editor, auth, content, and media routes.
 - `lib/site-builder.tsx`: Puck component and root settings registry.
+
+Image-bearing components expose a nine-position focal-point control; see [docs/IMAGE_CROPPING.md](docs/IMAGE_CROPPING.md) for the saved-data contract and extension rules.
 - `lib/templates.ts`: generic starter documents.
 - `lib/storage.ts`: filesystem/S3 persistence boundary.
 - `lib/auth.ts`: signed editor sessions and password verification.
@@ -143,7 +145,7 @@ Project map:
 
 ## Current scope
 
-Open Canvas intentionally publishes one site with one administrator password. It is not a multi-tenant SaaS, collaborative document editor, transcoding service, or arbitrary parent-page code runner. Those boundaries keep it understandable and easy to self-host. Storage and authentication are isolated so a team can replace either without rewriting the editor.
+christopher's website builder intentionally publishes one site with one administrator password. It is not a multi-tenant SaaS, collaborative document editor, transcoding service, or arbitrary parent-page code runner. Those boundaries keep it understandable and easy to self-host. Storage and authentication are isolated so a team can replace either without rewriting the editor.
 
 ## License
 
