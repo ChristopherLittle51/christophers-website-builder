@@ -11,12 +11,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "npm run test:embeds && npm run test:github && npm run test:media && npm run test:metadata && npm run test:puck-data",
+    "test": "npm run test:embeds && npm run test:github && npm run test:media && npm run test:metadata && npm run test:puck-data && npm run test:site-pages",
     "test:embeds": "node --experimental-strip-types --test lib/embed-utils.test.ts",
     "test:github": "node --experimental-strip-types --test lib/github.test.ts",
     "test:media": "node --experimental-strip-types --test lib/media.test.ts",
     "test:metadata": "node --experimental-strip-types --test lib/site-metadata.test.ts",
     "test:puck-data": "node --experimental-strip-types --test lib/puck-data.test.ts",
+    "test:site-pages": "node --experimental-strip-types --test lib/site-pages.test.ts",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {

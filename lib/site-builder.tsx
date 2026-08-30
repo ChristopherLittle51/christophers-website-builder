@@ -85,6 +85,18 @@ const nestedAllowlist = [
 const typeClass = (prefix: string, size = 'standard', tracking = 'tight') => `${prefix} ${prefix}--size-${size} ${prefix}--tracking-${tracking}`;
 const sectionNameField = { type: 'text' as const, label: 'Section link name', description: 'Use this name in links like #photography.' };
 const imagePosition = (crop?: string): CSSProperties => ({ objectPosition: crop || 'center center' });
+const stableNameHash = (value: string) => {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+};
+const generatedSectionName = (type: string, id: unknown) => {
+  const typeSlug = type.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'section';
+  return `generated-${typeSlug}-${stableNameHash(`${type}|${typeof id === 'string' ? id : ''}`)}`;
+};
 const qolGapOptions = [{ label: 'Tight', value: 'tight' }, { label: 'Comfortable', value: 'comfortable' }, { label: 'Airy', value: 'airy' }];
 const qolPaddingOptions = [{ label: 'None', value: 'none' }, { label: 'Compact', value: 'compact' }, { label: 'Generous', value: 'generous' }];
 const qolRadiusOptions = [{ label: 'Sharp', value: 'sharp' }, { label: 'Soft', value: 'soft' }, { label: 'Round', value: 'round' }];
@@ -303,7 +315,7 @@ export const builderConfig: Config<any> = {
         content: { type: 'slot', label: 'Row content', allow: nestedAllowlist },
       },
       defaultProps: { gap: 'comfortable', wrap: 'wrap', align: 'center', justify: 'start', theme: 'paper', content: [{ type: 'Badge', props: { text: 'New', tone: 'lime', size: 'small' } }, { type: 'ParagraphBlock', props: { text: 'A flexible row for controls, tags, or short bits of content.', font: 'inherit', size: 'small', align: 'left', width: 'normal' } }] },
-      render: ({ gap, wrap, align, justify, theme, content: Content }) => <div className={`builder-flex-row builder-flex-row--gap-${gap} builder-flex-row--wrap-${wrap} builder-flex-row--align-${align} builder-flex-row--justify-${justify} builder-theme--${theme}`}>{Content ? <Content /> : null}</div>,
+      render: ({ gap, wrap, align, justify, theme, content: Content }) => <section className={`builder-flex-row builder-theme--${theme || 'paper'}`}>{Content ? <Content className={`builder-flex-row__content builder-flex-row__content--gap-${gap || 'comfortable'} builder-flex-row__content--wrap-${wrap || 'wrap'} builder-flex-row__content--align-${align || 'center'} builder-flex-row__content--justify-${justify || 'start'}`} collisionAxis="x" minEmptyHeight={112} /> : null}</section>,
     },
     FlexColumn: {
       label: 'Flex column',
@@ -315,7 +327,7 @@ export const builderConfig: Config<any> = {
         content: { type: 'slot', label: 'Column content', allow: nestedAllowlist },
       },
       defaultProps: { gap: 'comfortable', align: 'stretch', padding: 'compact', theme: 'paper', content: [{ type: 'HeadingBlock', props: { text: 'A calm stack.', level: 'h2', font: 'inherit', size: 'compact', tracking: 'tight', align: 'left' } }, { type: 'ParagraphBlock', props: { text: 'Use a column to keep related content together at any breakpoint.', font: 'inherit', size: 'standard', align: 'left', width: 'normal' } }] },
-      render: ({ gap, align, padding, theme, content: Content }) => <div className={`builder-flex-column builder-flex-column--gap-${gap} builder-flex-column--align-${align} builder-flex-column--pad-${padding} builder-theme--${theme}`}>{Content ? <Content /> : null}</div>,
+      render: ({ gap, align, padding, theme, content: Content }) => <section className={`builder-flex-column builder-theme--${theme || 'paper'}`}>{Content ? <Content className={`builder-flex-column__content builder-flex-column__content--gap-${gap || 'comfortable'} builder-flex-column__content--align-${align || 'stretch'} builder-flex-column__content--pad-${padding || 'compact'}`} collisionAxis="y" minEmptyHeight={112} /> : null}</section>,
     },
     InsetContainer: {
       label: 'Inset container',
@@ -834,9 +846,14 @@ export const builderConfig: Config<any> = {
 // Keep the section-name control and anchor behavior consistent across every
 // current and future block registered above. Root settings are intentionally
 // excluded because the root is the page canvas, not a linkable section.
-for (const component of Object.values(builderConfig.components)) {
+for (const [componentType, component] of Object.entries(builderConfig.components)) {
   component.fields = { name: sectionNameField, ...component.fields };
   component.render = withSectionAnchor(component.render);
+  component.resolveData = ({ props }: { props: Record<string, unknown> }) => {
+    const name = typeof props.name === 'string' ? props.name.trim() : '';
+    if (name) return { props };
+    return { props: { ...props, name: generatedSectionName(componentType, props.id) } };
+  };
 }
 
 export { starterData } from './templates';

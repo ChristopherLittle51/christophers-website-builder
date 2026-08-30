@@ -13,10 +13,13 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import type { Data } from '@puckeditor/core';
+import type { SitePage } from './site-pages';
 
 export type SiteDocument = {
   published: Data;
   draft: Data;
+  pages?: SitePage[];
+  homepageId?: string;
   version: number;
   updatedAt: string | null;
   updatedBy: string;
