@@ -36,6 +36,9 @@
 .color-field input[type='color'] { border: 1px solid #ccc; height: 34px; padding: 2px; width: 42px; }
 .color-field input[type='text'] { border: 1px solid #ccc; border-radius: 4px; font: 12px ui-monospace,monospace; min-width: 0; padding: 7px; }
 
+/* Make empty nested slots easy to acquire while retaining Puck's own DnD logic. */
+.builder-container__dropzone:empty { min-height: 220px; }
+
 @media (max-width: 699px) {
   .editor-intro strong { display: none; }
   .editor-intro a { font-size: 9px; }

@@ -76,10 +76,19 @@ const nestedAllowlist = [
   'HeaderLinkBar', 'FooterSitemap', 'LayoutContainer', 'EditorialHero', 'SplitFeature', 'TextBlock', 'ImageBlock', 'ButtonBlock', 'ExpandableGrid', 'ProjectGrid', 'GalleryBlock',
   'BeforeAfter', 'StickyStory', 'TimelineBlock', 'MarqueeBlock', 'ContactBlock', 'HeadingBlock', 'ParagraphBlock', 'EyebrowBlock', 'DividerBlock',
   'SpacerBlock', 'QuoteBlock', 'VideoBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'GitHubRepositoryBlock', 'CalendlyBlock', 'CustomCodeBlock',
+  'FilmStripBlock', 'ContactSheetBlock', 'DirectorsSlateBlock', 'LensHeroBlock', 'ViewfinderBlock', 'StoryboardBlock', 'ReelShowcaseBlock', 'ColorGradeBlock', 'FilmStockBlock', 'EndCreditsBlock',
+  'FlexRow', 'FlexColumn', 'InsetContainer', 'AspectRatio', 'Card', 'Callout', 'Badge', 'ButtonGroup', 'Breadcrumbs', 'Accordion', 'MediaText',
+  'FeatureList', 'LogoCloud', 'AvatarGroup', 'MetricList', 'Checklist', 'SocialLinks', 'CodeSnippet', 'EmbedFrame', 'Notice',
+  'DeveloperHeroBlock', 'CodeSnippetBlock', 'TerminalBlock', 'TechStackBlock', 'DeveloperFeaturesBlock', 'ApiEndpointBlock', 'ArchitectureBlock', 'ChangelogBlock',
+  'OpenSourceBlock', 'DeveloperStatsBlock', 'DocsCalloutBlock', 'DeveloperCtaBlock',
 ];
 const typeClass = (prefix: string, size = 'standard', tracking = 'tight') => `${prefix} ${prefix}--size-${size} ${prefix}--tracking-${tracking}`;
 const sectionNameField = { type: 'text' as const, label: 'Section link name', description: 'Use this name in links like #photography.' };
 const imagePosition = (crop?: string): CSSProperties => ({ objectPosition: crop || 'center center' });
+const qolGapOptions = [{ label: 'Tight', value: 'tight' }, { label: 'Comfortable', value: 'comfortable' }, { label: 'Airy', value: 'airy' }];
+const qolPaddingOptions = [{ label: 'None', value: 'none' }, { label: 'Compact', value: 'compact' }, { label: 'Generous', value: 'generous' }];
+const qolRadiusOptions = [{ label: 'Sharp', value: 'sharp' }, { label: 'Soft', value: 'soft' }, { label: 'Round', value: 'round' }];
+const qolToneOptions = [{ label: 'Paper', value: 'paper' }, { label: 'Black', value: 'black' }, { label: 'Accent', value: 'lime' }];
 
 // Add the anchor to the block's existing root element so it does not introduce
 // a layout wrapper around blocks that participate in grids or flex layouts.
@@ -279,8 +288,166 @@ export const builderConfig: Config<any> = {
     galleries: { title: 'Images & work', components: ['ExpandableGrid', 'ProjectGrid', 'GalleryBlock', 'ImageBlock', 'BeforeAfter'], defaultExpanded: true },
     storytelling: { title: 'Storytelling', components: ['StickyStory', 'TimelineBlock', 'QuoteBlock', 'VideoBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'MarqueeBlock', 'ContactBlock'], defaultExpanded: true },
     integrations: { title: 'Embeds & integrations', components: ['GitHubRepositoryBlock', 'CalendlyBlock', 'CustomCodeBlock'], defaultExpanded: true },
+    qol: { title: 'Quality of life', components: ['FlexRow', 'FlexColumn', 'InsetContainer', 'AspectRatio', 'Card', 'Callout', 'Badge', 'ButtonGroup', 'Breadcrumbs', 'Accordion', 'MediaText', 'FeatureList', 'LogoCloud', 'AvatarGroup', 'MetricList', 'Checklist', 'SocialLinks', 'CodeSnippet', 'EmbedFrame', 'Notice'], defaultExpanded: true },
+    developer: { title: 'Developer', components: ['DeveloperHeroBlock', 'CodeSnippetBlock', 'TerminalBlock', 'TechStackBlock', 'DeveloperFeaturesBlock', 'ApiEndpointBlock', 'ArchitectureBlock', 'ChangelogBlock', 'OpenSourceBlock', 'DeveloperStatsBlock', 'DocsCalloutBlock', 'DeveloperCtaBlock'], defaultExpanded: true },
   },
   components: {
+    FlexRow: {
+      label: 'Flex row',
+      fields: {
+        gap: { type: 'radio', label: 'Gap', options: qolGapOptions },
+        wrap: { type: 'radio', label: 'Wrap items', options: [{ label: 'Wrap', value: 'wrap' }, { label: 'Single line', value: 'nowrap' }] },
+        align: { type: 'radio', label: 'Vertical alignment', options: [{ label: 'Start', value: 'start' }, { label: 'Center', value: 'center' }, { label: 'End', value: 'end' }, { label: 'Stretch', value: 'stretch' }] },
+        justify: { type: 'radio', label: 'Horizontal distribution', options: [{ label: 'Start', value: 'start' }, { label: 'Between', value: 'between' }, { label: 'Center', value: 'center' }, { label: 'End', value: 'end' }] },
+        theme: { type: 'radio', label: 'Theme', options: qolToneOptions },
+        content: { type: 'slot', label: 'Row content', allow: nestedAllowlist },
+      },
+      defaultProps: { gap: 'comfortable', wrap: 'wrap', align: 'center', justify: 'start', theme: 'paper', content: [{ type: 'Badge', props: { text: 'New', tone: 'lime', size: 'small' } }, { type: 'ParagraphBlock', props: { text: 'A flexible row for controls, tags, or short bits of content.', font: 'inherit', size: 'small', align: 'left', width: 'normal' } }] },
+      render: ({ gap, wrap, align, justify, theme, content: Content }) => <div className={`builder-flex-row builder-flex-row--gap-${gap} builder-flex-row--wrap-${wrap} builder-flex-row--align-${align} builder-flex-row--justify-${justify} builder-theme--${theme}`}>{Content ? <Content /> : null}</div>,
+    },
+    FlexColumn: {
+      label: 'Flex column',
+      fields: {
+        gap: { type: 'radio', label: 'Gap', options: qolGapOptions },
+        align: { type: 'radio', label: 'Horizontal alignment', options: [{ label: 'Start', value: 'start' }, { label: 'Center', value: 'center' }, { label: 'End', value: 'end' }, { label: 'Stretch', value: 'stretch' }] },
+        padding: { type: 'radio', label: 'Inner spacing', options: qolPaddingOptions },
+        theme: { type: 'radio', label: 'Theme', options: qolToneOptions },
+        content: { type: 'slot', label: 'Column content', allow: nestedAllowlist },
+      },
+      defaultProps: { gap: 'comfortable', align: 'stretch', padding: 'compact', theme: 'paper', content: [{ type: 'HeadingBlock', props: { text: 'A calm stack.', level: 'h2', font: 'inherit', size: 'compact', tracking: 'tight', align: 'left' } }, { type: 'ParagraphBlock', props: { text: 'Use a column to keep related content together at any breakpoint.', font: 'inherit', size: 'standard', align: 'left', width: 'normal' } }] },
+      render: ({ gap, align, padding, theme, content: Content }) => <div className={`builder-flex-column builder-flex-column--gap-${gap} builder-flex-column--align-${align} builder-flex-column--pad-${padding} builder-theme--${theme}`}>{Content ? <Content /> : null}</div>,
+    },
+    InsetContainer: {
+      label: 'Inset container',
+      fields: {
+        width: { type: 'radio', label: 'Content width', options: [{ label: 'Narrow', value: 'narrow' }, { label: 'Standard', value: 'standard' }, { label: 'Wide', value: 'wide' }] },
+        padding: { type: 'radio', label: 'Outer spacing', options: qolPaddingOptions },
+        align: { type: 'radio', label: 'Text alignment', options: alignOptions },
+        theme: { type: 'radio', label: 'Theme', options: qolToneOptions },
+        content: { type: 'slot', label: 'Container content', allow: nestedAllowlist },
+      },
+      defaultProps: { width: 'standard', padding: 'generous', align: 'left', theme: 'paper', content: [{ type: 'ParagraphBlock', props: { text: 'An inset container gives a section a dependable reading measure.', font: 'inherit', size: 'lead', align: 'left', width: 'normal' } }] },
+      render: ({ width, padding, align, theme, content: Content }) => <section className={`builder-inset builder-inset--width-${width} builder-inset--pad-${padding} builder-inset--${align} builder-theme--${theme}`}><div>{Content ? <Content /> : null}</div></section>,
+    },
+    AspectRatio: {
+      label: 'Aspect ratio frame',
+      fields: {
+        ratio: { type: 'radio', label: 'Ratio', options: [{ label: 'Square', value: 'square' }, { label: 'Landscape', value: 'landscape' }, { label: 'Widescreen', value: 'wide' }, { label: 'Portrait', value: 'portrait' }] },
+        overflow: { type: 'radio', label: 'Overflow', options: [{ label: 'Clip', value: 'clip' }, { label: 'Show', value: 'show' }] },
+        theme: { type: 'radio', label: 'Theme', options: qolToneOptions },
+        content: { type: 'slot', label: 'Frame content', allow: nestedAllowlist },
+      },
+      defaultProps: { ratio: 'landscape', overflow: 'clip', theme: 'black', content: [{ type: 'ImageBlock', props: { image: '/images/photo-1.jpg', alt: 'Framed portfolio image', caption: '', shape: 'landscape' } }] },
+      render: ({ ratio, overflow, theme, content: Content }) => <div className={`builder-aspect-frame builder-aspect-frame--${ratio} builder-aspect-frame--overflow-${overflow} builder-theme--${theme}`}><div>{Content ? <Content /> : null}</div></div>,
+    },
+    Card: {
+      label: 'Card',
+      fields: {
+        eyebrow: { type: 'text', label: 'Eyebrow', contentEditable: true },
+        title: { type: 'text', label: 'Title', contentEditable: true },
+        body: { type: 'textarea', label: 'Body', contentEditable: true },
+        actionLabel: { type: 'text', label: 'Action label', contentEditable: true }, actionUrl: { type: 'text', label: 'Action URL' },
+        tone: { type: 'radio', label: 'Tone', options: qolToneOptions }, radius: { type: 'radio', label: 'Corners', options: qolRadiusOptions },
+      },
+      defaultProps: { eyebrow: '01 / Service', title: 'A useful card.', body: 'Keep a small idea, offer, or next step easy to scan.', actionLabel: 'Learn more', actionUrl: '#', tone: 'paper', radius: 'soft' },
+      render: ({ eyebrow, title, body, actionLabel, actionUrl, tone, radius }) => <article className={`builder-card builder-theme--${tone} builder-card--radius-${radius}`}><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2><p>{body}</p>{actionLabel ? <a href={actionUrl || '#'}>{actionLabel}<span aria-hidden="true">↗</span></a> : null}</article>,
+    },
+    Callout: {
+      label: 'Callout',
+      fields: {
+        label: { type: 'text', label: 'Label', contentEditable: true }, title: { type: 'text', label: 'Title', contentEditable: true }, body: { type: 'textarea', label: 'Message', contentEditable: true },
+        actionLabel: { type: 'text', label: 'Action label', contentEditable: true }, actionUrl: { type: 'text', label: 'Action URL' }, tone: { type: 'radio', label: 'Tone', options: [{ label: 'Info', value: 'info' }, { label: 'Success', value: 'success' }, { label: 'Warning', value: 'warning' }] },
+      },
+      defaultProps: { label: 'Good to know', title: 'A small detail worth seeing.', body: 'Use a callout for context, a note, or a helpful next action.', actionLabel: '', actionUrl: '#', tone: 'info' },
+      render: ({ label, title, body, actionLabel, actionUrl, tone }) => <aside className={`builder-callout builder-callout--${tone}`} role="note"><p className="builder-kicker">{label}</p><h2>{title}</h2><p>{body}</p>{actionLabel ? <a href={actionUrl || '#'}>{actionLabel} ↗</a> : null}</aside>,
+    },
+    Badge: {
+      label: 'Badge / tag',
+      fields: { text: { type: 'text', label: 'Text', contentEditable: true }, tone: { type: 'radio', label: 'Tone', options: qolToneOptions }, size: { type: 'radio', label: 'Size', options: [{ label: 'Small', value: 'small' }, { label: 'Standard', value: 'standard' }, { label: 'Large', value: 'large' }] } },
+      defaultProps: { text: 'Available', tone: 'lime', size: 'standard' },
+      render: ({ text, tone, size }) => <span className={`builder-badge builder-badge--${tone} builder-badge--${size}`}>{text}</span>,
+    },
+    ButtonGroup: {
+      label: 'Button group',
+      fields: {
+        align: { type: 'radio', label: 'Alignment', options: alignOptions }, gap: { type: 'radio', label: 'Gap', options: qolGapOptions },
+        buttons: { type: 'array', label: 'Buttons', min: 1, max: 6, arrayFields: { label: { type: 'text', label: 'Label' }, url: { type: 'text', label: 'URL' }, style: { type: 'radio', label: 'Style', options: [{ label: 'Solid', value: 'solid' }, { label: 'Outline', value: 'outline' }, { label: 'Text', value: 'text' }] } }, defaultItemProps: (index) => ({ label: `Action ${index + 1}`, url: '#', style: index === 0 ? 'solid' : 'outline' }), getItemSummary: (item, index) => item.label || `Button ${(index || 0) + 1}` },
+      },
+      defaultProps: { align: 'left', gap: 'comfortable', buttons: [{ label: 'Start a project', url: '#contact', style: 'solid' }, { label: 'See the work', url: '#work', style: 'outline' }] },
+      render: ({ align, gap, buttons }) => <div className={`builder-button-group builder-button-group--${align} builder-button-group--gap-${gap}`}>{(buttons || []).map((button: { label: string; url: string; style: string }, index: number) => <a className={`builder-button-group__button builder-button-group__button--${button.style}`} href={button.url || '#'} key={`${button.label}-${index}`}>{button.label}<span aria-hidden="true">↗</span></a>)}</div>,
+    },
+    Breadcrumbs: {
+      label: 'Breadcrumbs',
+      fields: { ariaLabel: { type: 'text', label: 'Navigation label' }, current: { type: 'text', label: 'Current page', contentEditable: true }, links: { type: 'array', label: 'Parent pages', min: 1, max: 6, arrayFields: { label: { type: 'text', label: 'Label' }, url: { type: 'text', label: 'URL' } }, defaultItemProps: (index) => ({ label: `Parent ${index + 1}`, url: '#' }), getItemSummary: (item, index) => item.label || `Parent ${(index || 0) + 1}` } },
+      defaultProps: { ariaLabel: 'Breadcrumb', current: 'Current page', links: [{ label: 'Work', url: '#work' }, { label: 'Projects', url: '#projects' }] },
+      render: ({ ariaLabel, current, links }) => <nav className="builder-breadcrumbs" aria-label={ariaLabel || 'Breadcrumb'}><ol>{(links || []).map((link: { label: string; url: string }, index: number) => <li key={`${link.label}-${index}`}><a href={link.url || '#'}>{link.label}</a><span aria-hidden="true">/</span></li>)}<li aria-current="page">{current}</li></ol></nav>,
+    },
+    Accordion: {
+      label: 'Accordion / details',
+      fields: { heading: { type: 'text', label: 'Heading', contentEditable: true }, items: { type: 'array', label: 'Details', min: 1, max: 12, arrayFields: { summary: { type: 'text', label: 'Summary' }, body: { type: 'textarea', label: 'Details' }, open: { type: 'radio', label: 'Open by default', options: [{ label: 'Closed', value: 'closed' }, { label: 'Open', value: 'open' }] } }, defaultItemProps: (index) => ({ summary: `Question ${index + 1}`, body: 'Add the supporting details here.', open: index === 0 ? 'open' : 'closed' }), getItemSummary: (item, index) => item.summary || `Details ${(index || 0) + 1}` } },
+      defaultProps: { heading: 'Questions, answered.', items: [{ summary: 'What belongs here?', body: 'Use native details for FAQs, process notes, or progressive disclosure.', open: 'open' }, { summary: 'Can I add more?', body: 'Yes. Add or reorder rows from the sidebar.', open: 'closed' }] },
+      render: ({ heading, items }) => <section className="builder-accordion"><h2>{heading}</h2><div>{(items || []).map((item: { summary: string; body: string; open: string }, index: number) => <details open={item.open === 'open'} key={`${item.summary}-${index}`}><summary>{item.summary}</summary><p>{item.body}</p></details>)}</div></section>,
+    },
+    MediaText: {
+      label: 'Media + nested text',
+      fields: { image: imageField('Media image'), crop: cropField(), alt: { type: 'text', label: 'Image description' }, side: { type: 'radio', label: 'Image side', options: [{ label: 'Left', value: 'left' }, { label: 'Right', value: 'right' }] }, ratio: { type: 'radio', label: 'Image ratio', options: [{ label: 'Square', value: 'square' }, { label: 'Landscape', value: 'landscape' }, { label: 'Portrait', value: 'portrait' }] }, content: { type: 'slot', label: 'Text content', allow: nestedAllowlist }, theme: { type: 'radio', label: 'Theme', options: qolToneOptions } },
+      defaultProps: { image: '/images/photo-2.jpg', crop: 'center center', alt: 'Creative project detail', side: 'left', ratio: 'portrait', theme: 'paper', content: [{ type: 'HeadingBlock', props: { text: 'Pair image with context.', level: 'h2', font: 'inherit', size: 'standard', tracking: 'tight', align: 'left' } }, { type: 'ParagraphBlock', props: { text: 'A nested slot keeps the copy as editable as the image.', font: 'inherit', size: 'standard', align: 'left', width: 'normal' } }] },
+      render: ({ image, crop, alt, side, ratio, content: Content, theme }) => <section className={`builder-media-text builder-media-text--${side} builder-media-text--ratio-${ratio} builder-theme--${theme}`}><img src={image} alt={alt || ''} style={imagePosition(crop)} /><div>{Content ? <Content /> : null}</div></section>,
+    },
+    FeatureList: {
+      label: 'Feature list',
+      fields: { heading: { type: 'text', label: 'Heading', contentEditable: true }, intro: { type: 'textarea', label: 'Intro', contentEditable: true }, items: { type: 'array', label: 'Features', min: 1, max: 12, arrayFields: { title: { type: 'text', label: 'Title' }, body: { type: 'textarea', label: 'Description' }, marker: { type: 'text', label: 'Marker' } }, defaultItemProps: (index) => ({ title: `Feature ${index + 1}`, body: 'Describe a useful feature or promise.', marker: String(index + 1).padStart(2, '0') }), getItemSummary: (item, index) => item.title || `Feature ${(index || 0) + 1}` } },
+      defaultProps: { heading: 'A clear set of capabilities.', intro: 'Make the important parts easy to scan.', items: [{ title: 'Thoughtful structure', body: 'Organize information with a deliberate rhythm.', marker: '01' }, { title: 'Flexible details', body: 'Give every item enough room to be understood.', marker: '02' }, { title: 'Ready to use', body: 'Turn the finished idea into an obvious next step.', marker: '03' }] },
+      render: ({ heading, intro, items }) => <section className="builder-feature-list"><header><p className="builder-kicker">Features</p><h2>{heading}</h2><p>{intro}</p></header><ol>{(items || []).map((item: { title: string; body: string; marker: string }, index: number) => <li key={`${item.title}-${index}`}><span>{item.marker || String(index + 1).padStart(2, '0')}</span><div><h3>{item.title}</h3><p>{item.body}</p></div></li>)}</ol></section>,
+    },
+    LogoCloud: {
+      label: 'Logo cloud',
+      fields: { heading: { type: 'text', label: 'Heading', contentEditable: true }, logos: { type: 'array', label: 'Logos', min: 1, max: 16, arrayFields: { image: imageField('Logo image'), name: { type: 'text', label: 'Accessible name' }, url: { type: 'text', label: 'Link URL' } }, defaultItemProps: (index) => ({ image: '', name: `Partner ${index + 1}`, url: '#' }), getItemSummary: (item, index) => item.name || `Logo ${(index || 0) + 1}` } },
+      defaultProps: { heading: 'Selected collaborators', logos: [{ image: '', name: 'Northstar Studio', url: '#' }, { image: '', name: 'Field Notes', url: '#' }, { image: '', name: 'Common Ground', url: '#' }] },
+      render: ({ heading, logos }) => <section className="builder-logo-cloud"><h2>{heading}</h2><ul>{(logos || []).map((logo: { image: string; name: string; url: string }, index: number) => <li key={`${logo.name}-${index}`}><a href={logo.url || '#'} aria-label={logo.name || 'Collaborator'}>{logo.image ? <img src={logo.image} alt={logo.name || ''} /> : <span>{logo.name}</span>}</a></li>)}</ul></section>,
+    },
+    AvatarGroup: {
+      label: 'Avatar group',
+      fields: { label: { type: 'text', label: 'Group label', contentEditable: true }, people: { type: 'array', label: 'People', min: 1, max: 12, arrayFields: { image: imageField('Portrait'), name: { type: 'text', label: 'Name' }, url: { type: 'text', label: 'Profile URL' } }, defaultItemProps: (index) => ({ image: '', name: `Person ${index + 1}`, url: '#' }), getItemSummary: (item, index) => item.name || `Person ${(index || 0) + 1}` } },
+      defaultProps: { label: 'Made with good people', people: [{ image: '/images/photo-3.jpg', name: 'Alex Morgan', url: '#' }, { image: '/images/photo-4.jpg', name: 'Sam Lee', url: '#' }, { image: '/images/photo-5.jpg', name: 'Jordan Kim', url: '#' }] },
+      render: ({ label, people }) => <div className="builder-avatar-group"><p>{label}</p><ul>{(people || []).map((person: { image: string; name: string; url: string }, index: number) => <li key={`${person.name}-${index}`}><a href={person.url || '#'} aria-label={person.name || 'Contributor'}>{person.image ? <img src={person.image} alt={person.name || ''} /> : <span aria-hidden="true">{(person.name || '?').slice(0, 1)}</span>}</a></li>)}</ul></div>,
+    },
+    MetricList: {
+      label: 'Metric list',
+      fields: { heading: { type: 'text', label: 'Heading', contentEditable: true }, items: { type: 'array', label: 'Metrics', min: 1, max: 8, arrayFields: { value: { type: 'text', label: 'Value' }, label: { type: 'text', label: 'Label' }, detail: { type: 'text', label: 'Detail' } }, defaultItemProps: (index) => ({ value: '—', label: `Metric ${index + 1}`, detail: '' }), getItemSummary: (item, index) => item.label || `Metric ${(index || 0) + 1}` } },
+      defaultProps: { heading: 'At a glance', items: [{ value: '12+', label: 'Years making', detail: 'and learning' }, { value: '48', label: 'Stories shipped', detail: 'across formats' }, { value: '03', label: 'Ways to work', detail: 'near or far' }] },
+      render: ({ heading, items }) => <section className="builder-metric-list"><h2>{heading}</h2><dl>{(items || []).map((item: { value: string; label: string; detail: string }, index: number) => <div key={`${item.label}-${index}`}><dt>{item.value}</dt><dd><strong>{item.label}</strong>{item.detail ? <span>{item.detail}</span> : null}</dd></div>)}</dl></section>,
+    },
+    Checklist: {
+      label: 'Checklist',
+      fields: { heading: { type: 'text', label: 'Heading', contentEditable: true }, items: { type: 'array', label: 'Checklist items', min: 1, max: 12, arrayFields: { label: { type: 'text', label: 'Item' }, detail: { type: 'text', label: 'Detail' }, state: { type: 'radio', label: 'State', options: [{ label: 'To do', value: 'todo' }, { label: 'Done', value: 'done' }] } }, defaultItemProps: (index) => ({ label: `Checklist item ${index + 1}`, detail: '', state: 'todo' }), getItemSummary: (item, index) => item.label || `Item ${(index || 0) + 1}` } },
+      defaultProps: { heading: 'A simple checklist', items: [{ label: 'Define the brief', detail: 'Align on the useful part first.', state: 'done' }, { label: 'Make the thing', detail: 'Give the idea a clear shape.', state: 'todo' }, { label: 'Share the result', detail: 'Make the next step obvious.', state: 'todo' }] },
+      render: ({ heading, items }) => <section className="builder-checklist"><h2>{heading}</h2><ul>{(items || []).map((item: { label: string; detail: string; state: string }, index: number) => <li className={item.state === 'done' ? 'builder-checklist__item--done' : ''} key={`${item.label}-${index}`}><span aria-hidden="true">{item.state === 'done' ? '✓' : '○'}</span><div><strong>{item.label}</strong>{item.detail ? <p>{item.detail}</p> : null}</div></li>)}</ul></section>,
+    },
+    SocialLinks: {
+      label: 'Social links',
+      fields: { label: { type: 'text', label: 'Navigation label', contentEditable: true }, links: { type: 'array', label: 'Social links', min: 1, max: 12, arrayFields: { platform: { type: 'text', label: 'Platform' }, label: { type: 'text', label: 'Visible label' }, url: { type: 'text', label: 'URL' } }, defaultItemProps: (index) => ({ platform: `Social ${index + 1}`, label: `Follow on social ${index + 1}`, url: '#' }), getItemSummary: (item, index) => item.platform || `Social ${(index || 0) + 1}` } },
+      defaultProps: { label: 'Elsewhere', links: [{ platform: 'Instagram', label: '@studio', url: '#' }, { platform: 'Are.na', label: 'Collected references', url: '#' }, { platform: 'Email', label: 'hello@example.com', url: 'mailto:hello@example.com' }] },
+      render: ({ label, links }) => <nav className="builder-social-links" aria-label={label || 'Social links'}><p className="builder-kicker">{label}</p><ul>{(links || []).map((link: { platform: string; label: string; url: string }, index: number) => <li key={`${link.platform}-${index}`}><a href={link.url || '#'}><span>{link.platform}</span><strong>{link.label}</strong><span aria-hidden="true">↗</span></a></li>)}</ul></nav>,
+    },
+    CodeSnippet: {
+      label: 'Code snippet',
+      fields: { title: { type: 'text', label: 'Title', contentEditable: true }, language: { type: 'text', label: 'Language' }, code: { type: 'textarea', label: 'Code', contentEditable: true }, copyLabel: { type: 'text', label: 'Copy hint', contentEditable: true } },
+      defaultProps: { title: 'A small useful snippet', language: 'CSS', code: '.thing {\n  display: grid;\n  gap: 1rem;\n}', copyLabel: 'Readable, editable, yours.' },
+      render: ({ title, language, code, copyLabel }) => <figure className="builder-code-snippet"><figcaption><strong>{title}</strong><span>{language}</span></figcaption><pre><code>{code}</code></pre>{copyLabel ? <p>{copyLabel}</p> : null}</figure>,
+    },
+    EmbedFrame: {
+      label: 'Embed frame',
+      fields: { title: { type: 'text', label: 'Accessible frame title' }, url: { type: 'text', label: 'Embed URL' }, height: { type: 'radio', label: 'Height', options: [{ label: 'Compact', value: 'compact' }, { label: 'Standard', value: 'standard' }, { label: 'Tall', value: 'tall' }] }, caption: { type: 'text', label: 'Caption', contentEditable: true } },
+      defaultProps: { title: 'Embedded content', url: '', height: 'standard', caption: 'Embedded content' },
+      render: ({ title, url, height, caption }) => <figure className={`builder-embed-frame builder-embed-frame--${height}`}>{url ? <iframe src={url} title={title || 'Embedded content'} loading="lazy" allowFullScreen /> : <div role="status">Add an embed URL in the sidebar.</div>}{caption ? <figcaption>{caption}</figcaption> : null}</figure>,
+    },
+    Notice: {
+      label: 'Notice',
+      fields: { title: { type: 'text', label: 'Title', contentEditable: true }, message: { type: 'textarea', label: 'Message', contentEditable: true }, tone: { type: 'radio', label: 'Tone', options: [{ label: 'Neutral', value: 'neutral' }, { label: 'Positive', value: 'positive' }, { label: 'Caution', value: 'caution' }] }, dismissible: { type: 'radio', label: 'Dismiss affordance', options: [{ label: 'None', value: 'none' }, { label: 'Show close hint', value: 'hint' }] } },
+      defaultProps: { title: 'A quick note', message: 'Use a notice for a timely piece of context or a gentle heads-up.', tone: 'neutral', dismissible: 'none' },
+      render: ({ title, message, tone, dismissible }) => <aside className={`builder-notice builder-notice--${tone}`} role="status"><div><strong>{title}</strong><p>{message}</p></div>{dismissible === 'hint' ? <span aria-label="Dismissible notice">×</span> : null}</aside>,
+    },
     HeaderLinkBar: {
       label: 'Header / link bar',
       fields: {
@@ -336,7 +503,7 @@ export const builderConfig: Config<any> = {
         first: { type: 'slot', label: 'First column', allow: nestedAllowlist }, second: { type: 'slot', label: 'Second column', allow: nestedAllowlist }, third: { type: 'slot', label: 'Third column', allow: nestedAllowlist }, fourth: { type: 'slot', label: 'Fourth column', allow: nestedAllowlist },
       },
       defaultProps: { columns: 'two', ratio: 'even', gap: 'tight', padding: 'compact', verticalAlign: 'start', theme: 'paper', first: [{ type: 'HeadingBlock', props: { text: 'Build a layout.', level: 'h2', font: 'inherit', size: 'standard', tracking: 'tight', align: 'left' } }, { type: 'ParagraphBlock', props: { text: 'Drag any block—including another container—into each column.', font: 'inherit', size: 'standard', align: 'left', width: 'normal' } }], second: [{ type: 'ImageBlock', props: { image: '/images/photo-1.jpg', alt: 'Portfolio photograph', caption: 'Column two', shape: 'portrait' } }], third: [], fourth: [] },
-      render: ({ columns, ratio, gap, padding, verticalAlign, theme, first: First, second: Second, third: Third, fourth: Fourth }) => <section className={`builder-container builder-container--${columns} builder-container--${ratio} builder-container--gap-${gap} builder-container--pad-${padding} builder-container--align-${verticalAlign} builder-theme--${theme}`}><div className="builder-container__cell"><First /></div>{columns !== 'one' ? <div className="builder-container__cell"><Second /></div> : null}{columns === 'three' || columns === 'four' ? <div className="builder-container__cell"><Third /></div> : null}{columns === 'four' ? <div className="builder-container__cell"><Fourth /></div> : null}</section>,
+      render: ({ columns, ratio, gap, padding, verticalAlign, theme, first: First, second: Second, third: Third, fourth: Fourth }) => <section className={`builder-container builder-container--${columns} builder-container--${ratio} builder-container--gap-${gap} builder-container--pad-${padding} builder-container--align-${verticalAlign} builder-theme--${theme}`}><div className="builder-container__cell"><First className="builder-container__dropzone" minEmptyHeight={220} /></div>{columns !== 'one' ? <div className="builder-container__cell"><Second className="builder-container__dropzone" minEmptyHeight={220} /></div> : null}{columns === 'three' || columns === 'four' ? <div className="builder-container__cell"><Third className="builder-container__dropzone" minEmptyHeight={220} /></div> : null}{columns === 'four' ? <div className="builder-container__cell"><Fourth className="builder-container__dropzone" minEmptyHeight={220} /></div> : null}</section>,
     },
     HeadingBlock: {
       label: 'Heading',
@@ -575,6 +742,78 @@ export const builderConfig: Config<any> = {
 </script>`,
       },
       render: ({ title, code, height, frame, puck }) => <section className={`builder-code builder-code--${frame}`}><div className={`builder-code__stage${puck?.isEditing ? ' builder-embed-stage--editing' : ''}`} style={{ height: embedHeights[height] || embedHeights.standard }}><iframe key={code} srcDoc={code} title={title || 'Custom interactive content'} sandbox="allow-forms allow-modals allow-scripts" allow="autoplay; fullscreen" referrerPolicy="no-referrer" />{puck?.isEditing ? <span className="builder-embed-stage__label">Sandboxed code preview · edit from the sidebar</span> : null}</div></section>,
+    },
+    DeveloperHeroBlock: {
+      label: 'Developer hero',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'textarea', label: 'Headline', contentEditable: true }, body: { type: 'textarea', label: 'Supporting text', contentEditable: true }, ctaLabel: { type: 'text', label: 'Button label', contentEditable: true }, ctaUrl: { type: 'text', label: 'Button URL' }, status: { type: 'text', label: 'Status label', contentEditable: true }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { eyebrow: 'Independent software maker', title: 'MAKE THE INVISIBLE USEFUL.', body: 'I design and build calm, durable products for teams doing meaningful work.', ctaLabel: 'See the work ↗', ctaUrl: '#work', status: 'AVAILABLE FOR SELECT BUILDS', theme: 'black' },
+      render: ({ eyebrow, title, body, ctaLabel, ctaUrl, status, theme }) => <section className={'builder-dev-hero builder-theme--' + theme}><div className="builder-dev-hero__grid"><p className="builder-kicker">{eyebrow}</p><span className="builder-dev-hero__status"><i />{status}</span></div><h1>{title}</h1><div className="builder-dev-hero__footer"><p>{body}</p><a href={ctaUrl || '#'}>{ctaLabel}</a></div></section>,
+    },
+    CodeSnippetBlock: {
+      label: 'Code snippet',
+      fields: { eyebrow: { type: 'text', label: 'Language label', contentEditable: true }, title: { type: 'text', label: 'Snippet title', contentEditable: true }, code: { type: 'textarea', label: 'Code', contentEditable: true }, filename: { type: 'text', label: 'Filename' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { eyebrow: 'TypeScript', title: 'A small boundary with a clear job.', filename: 'lib/format.ts', code: "export function formatName(name: string) {\\n  return name.trim().replace(/\\\\s+/g, ' ');\\n}", theme: 'black' },
+      render: ({ eyebrow, title, code, filename, theme }) => <section className={'builder-dev-code builder-theme--' + theme}><header><span>{eyebrow}</span><strong>{filename}</strong></header><h2>{title}</h2><pre><code>{code}</code></pre></section>,
+    },
+    TerminalBlock: {
+      label: 'Terminal session',
+      fields: { title: { type: 'text', label: 'Terminal title' }, prompt: { type: 'text', label: 'Prompt' }, lines: { type: 'array', label: 'Terminal lines', min: 1, max: 16, arrayFields: { text: { type: 'text', label: 'Line' }, kind: { type: 'radio', label: 'Line type', options: [{ label: 'Command', value: 'command' }, { label: 'Output', value: 'output' }, { label: 'Success', value: 'success' }] } }, defaultItemProps: (index) => ({ text: index === 0 ? 'npm run build' : 'Build completed successfully.', kind: index === 0 ? 'command' : 'success' }), getItemSummary: (item, index) => item.text || 'Line ' + ((index || 0) + 1) } },
+      defaultProps: { title: 'Local development', prompt: 'sam@studio:~/project$', lines: [{ text: 'npm run build', kind: 'command' }, { text: '▲ Compiled in 1.8s', kind: 'output' }, { text: 'Build completed successfully.', kind: 'success' }] },
+      render: ({ title, prompt, lines }) => <section className="builder-dev-terminal"><header><span>{title}</span><i aria-hidden="true" /><i aria-hidden="true" /><i aria-hidden="true" /></header><div><p className="builder-dev-terminal__prompt">{prompt}</p>{(lines || []).map((line: { text: string; kind: string }, index: number) => <p className={'builder-dev-terminal__line builder-dev-terminal__line--' + (line.kind || 'output')} key={line.text + '-' + index}><span>{line.kind === 'command' ? '›' : line.kind === 'success' ? '✓' : ' '}</span>{line.text}</p>)}</div></section>,
+    },
+    TechStackBlock: {
+      label: 'Tech stack',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Title', contentEditable: true }, items: { type: 'array', label: 'Technologies', min: 2, max: 16, arrayFields: { name: { type: 'text', label: 'Name' }, detail: { type: 'text', label: 'Role / detail' }, mark: { type: 'text', label: 'Mark' } }, defaultItemProps: (index) => ({ name: 'Tool ' + (index + 1), detail: 'A reliable part of the toolkit', mark: '◎' }), getItemSummary: (item, index) => item.name || 'Tool ' + ((index || 0) + 1) } },
+      defaultProps: { eyebrow: 'The tools behind the work', title: 'A considered stack.', items: [{ name: 'TypeScript', detail: 'Typed interfaces', mark: 'TS' }, { name: 'React', detail: 'Composable UI', mark: '◒' }, { name: 'Postgres', detail: 'Durable data', mark: 'PG' }, { name: 'Playwright', detail: 'Confident releases', mark: '▶' }] },
+      render: ({ eyebrow, title, items }) => <section className="builder-dev-stack"><header><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2></header><ul>{(items || []).map((item: { name: string; detail: string; mark: string }, index: number) => <li key={item.name + '-' + index}><b>{item.mark}</b><span><strong>{item.name}</strong><small>{item.detail}</small></span><em>↗</em></li>)}</ul></section>,
+    },
+    DeveloperFeaturesBlock: {
+      label: 'Developer features',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Title', contentEditable: true }, columns: { type: 'radio', label: 'Columns', options: [{ label: 'Two', value: 'two' }, { label: 'Three', value: 'three' }] }, items: { type: 'array', label: 'Features', min: 2, max: 9, arrayFields: { number: { type: 'text', label: 'Number' }, title: { type: 'text', label: 'Feature title' }, body: { type: 'textarea', label: 'Description' }, tag: { type: 'text', label: 'Tag' } }, defaultItemProps: (index) => ({ number: String(index + 1).padStart(2, '0'), title: 'A sharp edge', body: 'Describe the useful detail that makes this work feel considered.', tag: 'DETAIL' }), getItemSummary: (item, index) => item.title || 'Feature ' + ((index || 0) + 1) } },
+      defaultProps: { eyebrow: 'What I care about', title: 'Good software feels inevitable.', columns: 'three', items: [{ number: '01', title: 'Clear by default', body: 'Interfaces should explain themselves before they ask for attention.', tag: 'UX' }, { number: '02', title: 'Built to last', body: 'Simple boundaries keep a product legible as it grows.', tag: 'SYSTEMS' }, { number: '03', title: 'Fast where it matters', body: 'Performance is part of the craft, not a final polish pass.', tag: 'SPEED' }] },
+      render: ({ eyebrow, title, columns, items }) => <section className={'builder-dev-features builder-dev-features--' + columns}><header><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2></header><div>{(items || []).map((item: { number: string; title: string; body: string; tag: string }, index: number) => <article key={item.title + '-' + index}><span>{item.number}</span><h3>{item.title}</h3><p>{item.body}</p><small>{item.tag}</small></article>)}</div></section>,
+    },
+    ApiEndpointBlock: {
+      label: 'API endpoint',
+      fields: { method: { type: 'radio', label: 'HTTP method', options: [{ label: 'GET', value: 'GET' }, { label: 'POST', value: 'POST' }, { label: 'PUT', value: 'PUT' }, { label: 'DELETE', value: 'DELETE' }] }, path: { type: 'text', label: 'Endpoint path' }, title: { type: 'text', label: 'Endpoint title', contentEditable: true }, description: { type: 'textarea', label: 'Description', contentEditable: true }, response: { type: 'textarea', label: 'Response example', contentEditable: true }, auth: { type: 'text', label: 'Authentication note' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { method: 'GET', path: '/v1/projects/:id', title: 'Read a project', description: 'Fetch the public project shape by its stable identifier.', response: '{\\n  \"id\": \"proj_7f2\",\\n  \"status\": \"active\"\\n}', auth: 'Public · rate limited', theme: 'paper' },
+      render: ({ method, path, title, description, response, auth, theme }) => <section className={'builder-dev-endpoint builder-theme--' + theme}><header><span className={'builder-dev-endpoint__method builder-dev-endpoint__method--' + String(method).toLowerCase()}>{method}</span><code>{path}</code></header><h2>{title}</h2><p>{description}</p><div className="builder-dev-endpoint__response"><span>Response · 200 OK</span><pre>{response}</pre></div><small>{auth}</small></section>,
+    },
+    ArchitectureBlock: {
+      label: 'Architecture map',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Title', contentEditable: true }, note: { type: 'textarea', label: 'Note', contentEditable: true }, nodes: { type: 'array', label: 'Layers', min: 2, max: 8, arrayFields: { label: { type: 'text', label: 'Layer label' }, detail: { type: 'text', label: 'Layer detail' }, color: colorField('Layer color') }, defaultItemProps: (index) => ({ label: 'Layer ' + (index + 1), detail: 'Describe this boundary.', color: '#d8ff00' }), getItemSummary: (item, index) => item.label || 'Layer ' + ((index || 0) + 1) } },
+      defaultProps: { eyebrow: 'How the pieces meet', title: 'Small boundaries. Strong seams.', note: 'A useful architecture is a map of responsibilities, not a monument to complexity.', nodes: [{ label: 'Interface', detail: 'The human-facing surface', color: '#d8ff00' }, { label: 'Application', detail: 'Rules and orchestration', color: '#8bd8ff' }, { label: 'Data', detail: 'Reliable persistence', color: '#ff9ac6' }] },
+      render: ({ eyebrow, title, note, nodes }) => <section className="builder-dev-architecture"><header><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2></header><div className="builder-dev-architecture__map">{(nodes || []).map((node: { label: string; detail: string; color: string }, index: number) => <div key={node.label + '-' + index}><span className="builder-dev-architecture__node" style={{ '--node-color': node.color || '#d8ff00' } as CSSProperties}>{String(index + 1).padStart(2, '0')}</span><strong>{node.label}</strong><small>{node.detail}</small>{index < (nodes || []).length - 1 ? <i aria-hidden="true">↓</i> : null}</div>)}</div><p className="builder-dev-architecture__note">{note}</p></section>,
+    },
+    ChangelogBlock: {
+      label: 'Changelog',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Title', contentEditable: true }, releases: { type: 'array', label: 'Releases', min: 1, max: 12, arrayFields: { version: { type: 'text', label: 'Version' }, date: { type: 'text', label: 'Date' }, summary: { type: 'text', label: 'Summary' }, changes: { type: 'textarea', label: 'Changes' } }, defaultItemProps: (index) => ({ version: 'v' + (index + 1) + '.0', date: 'AUG 2026', summary: 'A thoughtful release', changes: 'A useful improvement shipped with care.' }), getItemSummary: (item, index) => item.version || 'Release ' + ((index || 0) + 1) } },
+      defaultProps: { eyebrow: 'Release notes', title: 'What changed.', releases: [{ version: 'v2.4.0', date: 'AUG 28, 2026', summary: 'A faster way to find the signal.', changes: 'Added keyboard navigation, clearer empty states, and a smaller payload.' }, { version: 'v2.3.0', date: 'JUL 12, 2026', summary: 'More room for good work.', changes: 'Introduced project spaces and a calmer review flow.' }, { version: 'v2.2.1', date: 'JUN 03, 2026', summary: 'Polish at the edges.', changes: 'Fixed focus states and tightened mobile layout behavior.' }] },
+      render: ({ eyebrow, title, releases }) => <section className="builder-dev-changelog"><header><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2></header><ol>{(releases || []).map((release: { version: string; date: string; summary: string; changes: string }, index: number) => <li key={release.version + '-' + index}><div><strong>{release.version}</strong><time>{release.date}</time></div><h3>{release.summary}</h3><p>{release.changes}</p></li>)}</ol></section>,
+    },
+    OpenSourceBlock: {
+      label: 'Open source note',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Title', contentEditable: true }, body: { type: 'textarea', label: 'Description', contentEditable: true }, repoLabel: { type: 'text', label: 'Repository label' }, repoUrl: { type: 'text', label: 'Repository URL' }, license: { type: 'text', label: 'License' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { eyebrow: 'Public by design', title: 'Tools worth sharing.', body: 'A small collection of utilities, experiments, and patterns I keep useful in the open.', repoLabel: 'github.com/studio/toolkit', repoUrl: '#', license: 'MIT licensed', theme: 'lime' },
+      render: ({ eyebrow, title, body, repoLabel, repoUrl, license, theme }) => <section className={'builder-dev-open-source builder-theme--' + theme}><div><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2><p>{body}</p></div><a href={repoUrl || '#'}><span>{repoLabel}</span><strong>↗</strong></a><small>{license}</small></section>,
+    },
+    DeveloperStatsBlock: {
+      label: 'Developer metrics',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'text', label: 'Title', contentEditable: true }, items: { type: 'array', label: 'Metrics', min: 2, max: 8, arrayFields: { value: { type: 'text', label: 'Value' }, label: { type: 'text', label: 'Label' }, detail: { type: 'text', label: 'Detail' } }, defaultItemProps: (index) => ({ value: '—', label: 'Metric ' + (index + 1), detail: 'Add context.' }), getItemSummary: (item, index) => (item.value || '—') + ' · ' + (item.label || 'Metric ' + ((index || 0) + 1)) } },
+      defaultProps: { eyebrow: 'The numbers behind the practice', title: 'Measured, where it helps.', items: [{ value: '99.98%', label: 'Uptime', detail: 'Last 90 days' }, { value: '42ms', label: 'Median response', detail: 'Production API' }, { value: '0', label: 'Open regrets', detail: 'Still iterating' }] },
+      render: ({ eyebrow, title, items }) => <section className="builder-dev-stats"><header><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2></header><div>{(items || []).map((item: { value: string; label: string; detail: string }, index: number) => <article key={item.label + '-' + index}><strong>{item.value}</strong><span>{item.label}</span><small>{item.detail}</small></article>)}</div></section>,
+    },
+    DocsCalloutBlock: {
+      label: 'Documentation callout',
+      fields: { type: { type: 'radio', label: 'Callout type', options: [{ label: 'Tip', value: 'tip' }, { label: 'Warning', value: 'warning' }, { label: 'Note', value: 'note' }] }, title: { type: 'text', label: 'Title', contentEditable: true }, body: { type: 'textarea', label: 'Body', contentEditable: true }, code: { type: 'text', label: 'Inline code' }, linkLabel: { type: 'text', label: 'Link label' }, linkUrl: { type: 'text', label: 'Link URL' } },
+      defaultProps: { type: 'tip', title: 'Keep the boundary small.', body: 'When a component has one clear job, it is easier to test, document, and trust.', code: 'single responsibility', linkLabel: 'Read the principle ↗', linkUrl: '#' },
+      render: ({ type, title, body, code, linkLabel, linkUrl }) => <aside className={'builder-dev-callout builder-dev-callout--' + (type || 'note')}><span className="builder-dev-callout__mark">{type === 'warning' ? '!' : type === 'tip' ? '↗' : 'i'}</span><div><p className="builder-kicker">{type || 'note'}</p><h2>{title}</h2><p>{body} {code ? <code>{code}</code> : null}</p>{linkLabel ? <a href={linkUrl || '#'}>{linkLabel}</a> : null}</div></aside>,
+    },
+    DeveloperCtaBlock: {
+      label: 'Developer CTA',
+      fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'textarea', label: 'Headline', contentEditable: true }, body: { type: 'textarea', label: 'Supporting text', contentEditable: true }, primaryLabel: { type: 'text', label: 'Primary label', contentEditable: true }, primaryUrl: { type: 'text', label: 'Primary URL' }, secondaryLabel: { type: 'text', label: 'Secondary label', contentEditable: true }, secondaryUrl: { type: 'text', label: 'Secondary URL' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
+      defaultProps: { eyebrow: 'Have a useful problem?', title: 'LET’S BUILD THE NEXT RIGHT THING.', body: 'Tell me what is stuck, what matters, and where you want to go next.', primaryLabel: 'Start a conversation ↗', primaryUrl: 'mailto:hello@example.com', secondaryLabel: 'Browse the work', secondaryUrl: '#work', theme: 'black' },
+      render: ({ eyebrow, title, body, primaryLabel, primaryUrl, secondaryLabel, secondaryUrl, theme }) => <section className={'builder-dev-cta builder-theme--' + theme}><p className="builder-kicker">{eyebrow}</p><h2>{title}</h2><p>{body}</p><div><a className="builder-dev-cta__primary" href={primaryUrl || '#'}>{primaryLabel}</a><a href={secondaryUrl || '#'}>{secondaryLabel}</a></div></section>,
     },
     ContactBlock: {
       label: 'Contact footer', fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, title: { type: 'textarea', label: 'Headline', contentEditable: true }, titleFont: fontField('Headline font'), align: { type: 'radio', label: 'Alignment', options: alignOptions }, email: { type: 'text', label: 'Email address' }, buttonLabel: { type: 'text', label: 'Button label', contentEditable: true }, buttonUrl: { type: 'text', label: 'Button URL' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
