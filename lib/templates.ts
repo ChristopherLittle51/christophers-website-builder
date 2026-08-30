@@ -81,6 +81,20 @@ export const expressiveTemplate: Data = {
   ],
 };
 
+export const heroCompositionTemplate: Data = {
+  root: root('Studio Name — Composable Hero', '#b7a5ff', 'bricolage', 'dm-sans'),
+  content: [
+    { type: 'HeroLayout', props: { id: 'hero-composition', layout: 'split', image: '/images/demo-hero.jpg', imageCrop: 'center center', imageAlt: 'Abstract creative studio composition', imageSide: 'right', overlay: 'strong', horizontalAlign: 'left', verticalAlign: 'end', theme: 'paper', content: [
+      { type: 'EyebrowBlock', props: { id: 'hero-composition-eyebrow', text: 'Independent creative practice', font: 'inherit', align: 'left', rule: 'none' } },
+      { type: 'HeadingBlock', props: { id: 'hero-composition-heading', text: 'MAKE THE IDEA\nIMPOSSIBLE TO IGNORE.', level: 'h1', font: 'bricolage', size: 'oversized', tracking: 'tight', align: 'left' } },
+      { type: 'ParagraphBlock', props: { id: 'hero-composition-copy', text: 'Swap the treatment, media, and every line of content without leaving the composition system.', font: 'dm-sans', size: 'lead', align: 'left', width: 'normal' } },
+      { type: 'ButtonGroup', props: { id: 'hero-composition-actions', align: 'left', gap: 'comfortable', buttons: [{ label: 'See the work', url: '#work', style: 'solid' }, { label: 'Start a conversation', url: '#contact', style: 'outline' }] } },
+    ] } },
+    { type: 'ProjectGrid', props: { id: 'hero-composition-projects', number: '001', title: 'The rest of the story', intro: 'A hero can now use the same nested foundations as the sections that follow it.', image1: '/images/demo-coral.jpg', title1: 'Campaign direction', url1: '#', image2: '/images/demo-blue.jpg', title2: 'Moving image study', url2: '#', theme: 'paper' } },
+    { type: 'ContactBlock', props: { id: 'hero-composition-contact', eyebrow: 'A clear next step', title: 'Make the introduction your own.', email: 'hello@example.com', buttonLabel: 'Start a project', buttonUrl: 'mailto:hello@example.com', theme: 'lime' } },
+  ],
+};
+
 export const cinemaTemplate: Data = {
   root: root('Field Notes — Director & Photographer', '#f2c84b', 'space-grotesk', 'dm-sans'),
   content: [
@@ -102,6 +116,7 @@ export const templates = [
   { id: 'minimal', name: 'Minimal work index', description: 'A quiet, scalable image-first archive.', data: minimalTemplate },
   { id: 'case-study', name: 'Project case study', description: 'Tell one project story from brief through outcome.', data: caseStudyTemplate },
   { id: 'expressive', name: 'Expressive studio', description: 'A kinetic, editorial home for experiments and bold work.', data: expressiveTemplate },
+  { id: 'hero-composition', name: 'Composable hero', description: 'A flexible split, overlay, or text-only opening built from nested blocks.', data: heroCompositionTemplate },
   { id: 'cinema', name: 'Director’s treatment', description: 'Ten production-inspired blocks for photography and moving image.', data: cinemaTemplate },
 ] as const;
 

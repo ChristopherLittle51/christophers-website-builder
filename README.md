@@ -7,8 +7,8 @@ It is a normal Next.js application—not a hosted-platform project. Run it on a 
 ## What is included
 
 - Mobile-first drag-and-drop editing powered by [Puck](https://puckeditor.com/).
-- Five starter templates, including a complete Director’s treatment for photography and moving image.
-- Thirty-seven blocks spanning primitives, layouts, galleries, storytelling, media, integrations, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
+- Six starter templates, including a composable hero starter and a complete Director’s treatment for photography and moving image.
+- Seventy-two blocks organized into foundations, composition, hero options, portfolio storytelling, content patterns, media, integrations, developer, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
 - Recursive nested containers with one to four columns and container-query reflow.
 - Expandable image grids with editorial, uniform, and filmstrip layouts.
 - Per-field and global font control using nine bundled open-source font families.
@@ -108,12 +108,13 @@ Custom HTML/JS runs in an iframe with `sandbox="allow-forms allow-modals allow-s
 
 The main registry is `lib/site-builder.tsx`.
 
-- Primitives: heading, paragraph, eyebrow, image, button, divider, spacer.
-- Layouts: recursive 1–4 column container, editorial hero, split feature, text section.
-- Galleries: expandable grid, project cards, six-image gallery, before/after comparison.
-- Navigation: editable header/link bar and grouped footer/site map.
-- Storytelling: sticky story, process timeline, pull quote, marquee, link list, stats, credits, contact.
-- Media and integrations: uploaded/embedded video, Calendly, public GitHub repository metadata, sandboxed custom HTML/CSS/JS.
+- Foundations: heading, paragraph, eyebrow, image, button, divider, spacer, badge, and button group.
+- Layout & composition: recursive 1–4 column containers, flex rows/columns, inset and aspect-ratio wrappers, and media with a nested content slot.
+- Hero options: a new slot-based composable hero with split, overlay, and text-only treatments, plus editorial and technical presets. See [hero authoring](docs/HERO_COMPONENTS.md).
+- Portfolio & storytelling: split feature, text section, grids, project cards, gallery, before/after comparison, video, sticky story, timeline, pull quote, marquee, links, facts, credits, and contact.
+- Content patterns: cards, callouts, accordions, feature lists, logos, avatars, metrics, checklists, code snippets, and notices.
+- Navigation & integrations: editable header/link bar, footer/site map, breadcrumbs, social links, Calendly, public GitHub repository metadata, sandboxed custom HTML/CSS/JS, and generic embeds.
+- The exact category map and composition decisions live in [the component-library audit](docs/COMPONENT_LIBRARY_AUDIT.md).
 
 Templates are ordinary Puck JSON in `lib/templates.ts`. A new template must use registered component names and globally unique IDs. New component types should be added to `nestedAllowlist` so they can be used inside containers.
 
@@ -137,6 +138,8 @@ Image-bearing components expose a nine-position focal-point control; see [docs/I
 - `lib/auth.ts`: signed editor sessions and password verification.
 - `lib/puck-data.ts`: recursive component identity normalization.
 - `docs/SECTION_LINKS.md`: editable block anchors and authoring contract.
+- `docs/HERO_COMPONENTS.md`: composable hero fields, treatments, accessibility, and responsive verification.
+- `docs/COMPONENT_LIBRARY_AUDIT.md`: complete picker taxonomy and component composition decisions.
 - `lib/media.ts`: upload rules and HTTP byte-range parsing.
 - `docs/ARCHITECTURE.md`: contracts and extension points.
 - `docs/NAVIGATION_COMPONENTS.md`: header/link bar and footer/site map field contracts.

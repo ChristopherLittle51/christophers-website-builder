@@ -73,7 +73,7 @@ const trackingOptions = [{ label: 'Tight', value: 'tight' }, { label: 'Natural',
 const themeOptions = [{ label: 'Paper', value: 'paper' }, { label: 'Black', value: 'black' }, { label: 'Accent', value: 'lime' }];
 const embedHeights: Record<string, number> = { compact: 540, standard: 700, tall: 860 };
 const nestedAllowlist = [
-  'HeaderLinkBar', 'FooterSitemap', 'LayoutContainer', 'EditorialHero', 'SplitFeature', 'TextBlock', 'ImageBlock', 'ButtonBlock', 'ExpandableGrid', 'ProjectGrid', 'GalleryBlock',
+  'HeaderLinkBar', 'FooterSitemap', 'LayoutContainer', 'HeroLayout', 'EditorialHero', 'SplitFeature', 'TextBlock', 'ImageBlock', 'ButtonBlock', 'ExpandableGrid', 'ProjectGrid', 'GalleryBlock',
   'BeforeAfter', 'StickyStory', 'TimelineBlock', 'MarqueeBlock', 'ContactBlock', 'HeadingBlock', 'ParagraphBlock', 'EyebrowBlock', 'DividerBlock',
   'SpacerBlock', 'QuoteBlock', 'VideoBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'GitHubRepositoryBlock', 'CalendlyBlock', 'CustomCodeBlock',
   'FilmStripBlock', 'ContactSheetBlock', 'DirectorsSlateBlock', 'LensHeroBlock', 'ViewfinderBlock', 'StoryboardBlock', 'ReelShowcaseBlock', 'ColorGradeBlock', 'FilmStockBlock', 'EndCreditsBlock',
@@ -293,15 +293,15 @@ function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const builderConfig: Config<any> = {
   categories: {
-    navigation: { title: 'Navigation', components: ['HeaderLinkBar', 'FooterSitemap'], defaultExpanded: true },
-    primitives: { title: 'Building blocks', components: ['HeadingBlock', 'ParagraphBlock', 'EyebrowBlock', 'ImageBlock', 'ButtonBlock', 'DividerBlock', 'SpacerBlock'], defaultExpanded: true },
-    layout: { title: 'Layouts & sections', components: ['LayoutContainer', 'EditorialHero', 'SplitFeature', 'TextBlock'], defaultExpanded: true },
+    navigation: { title: 'Navigation & links', components: ['HeaderLinkBar', 'FooterSitemap', 'Breadcrumbs', 'SocialLinks'], defaultExpanded: true },
+    foundations: { title: 'Foundations', components: ['HeadingBlock', 'ParagraphBlock', 'EyebrowBlock', 'ImageBlock', 'ButtonBlock', 'DividerBlock', 'SpacerBlock', 'Badge', 'ButtonGroup'], defaultExpanded: true },
+    composition: { title: 'Layout & composition', components: ['LayoutContainer', 'FlexRow', 'FlexColumn', 'InsetContainer', 'AspectRatio', 'MediaText'], defaultExpanded: true },
+    heroes: { title: 'Hero options', components: ['HeroLayout', 'EditorialHero', 'DeveloperHeroBlock'], defaultExpanded: true },
+    portfolio: { title: 'Portfolio & storytelling', components: ['SplitFeature', 'TextBlock', 'ExpandableGrid', 'ProjectGrid', 'GalleryBlock', 'BeforeAfter', 'VideoBlock', 'StickyStory', 'TimelineBlock', 'QuoteBlock', 'MarqueeBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'ContactBlock'], defaultExpanded: true },
+    utility: { title: 'Content patterns', components: ['Card', 'Callout', 'Accordion', 'FeatureList', 'LogoCloud', 'AvatarGroup', 'MetricList', 'Checklist', 'CodeSnippet', 'Notice'], defaultExpanded: true },
     cinema: { title: 'Photo & cinema', components: ['FilmStripBlock', 'ContactSheetBlock', 'DirectorsSlateBlock', 'LensHeroBlock', 'ViewfinderBlock', 'StoryboardBlock', 'ReelShowcaseBlock', 'ColorGradeBlock', 'FilmStockBlock', 'EndCreditsBlock'], defaultExpanded: true },
-    galleries: { title: 'Images & work', components: ['ExpandableGrid', 'ProjectGrid', 'GalleryBlock', 'ImageBlock', 'BeforeAfter'], defaultExpanded: true },
-    storytelling: { title: 'Storytelling', components: ['StickyStory', 'TimelineBlock', 'QuoteBlock', 'VideoBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'MarqueeBlock', 'ContactBlock'], defaultExpanded: true },
-    integrations: { title: 'Embeds & integrations', components: ['GitHubRepositoryBlock', 'CalendlyBlock', 'CustomCodeBlock'], defaultExpanded: true },
-    qol: { title: 'Quality of life', components: ['FlexRow', 'FlexColumn', 'InsetContainer', 'AspectRatio', 'Card', 'Callout', 'Badge', 'ButtonGroup', 'Breadcrumbs', 'Accordion', 'MediaText', 'FeatureList', 'LogoCloud', 'AvatarGroup', 'MetricList', 'Checklist', 'SocialLinks', 'CodeSnippet', 'EmbedFrame', 'Notice'], defaultExpanded: true },
-    developer: { title: 'Developer', components: ['DeveloperHeroBlock', 'CodeSnippetBlock', 'TerminalBlock', 'TechStackBlock', 'DeveloperFeaturesBlock', 'ApiEndpointBlock', 'ArchitectureBlock', 'ChangelogBlock', 'OpenSourceBlock', 'DeveloperStatsBlock', 'DocsCalloutBlock', 'DeveloperCtaBlock'], defaultExpanded: true },
+    integrations: { title: 'Embeds & integrations', components: ['GitHubRepositoryBlock', 'CalendlyBlock', 'CustomCodeBlock', 'EmbedFrame'], defaultExpanded: true },
+    developer: { title: 'Developer', components: ['CodeSnippetBlock', 'TerminalBlock', 'TechStackBlock', 'DeveloperFeaturesBlock', 'ApiEndpointBlock', 'ArchitectureBlock', 'ChangelogBlock', 'OpenSourceBlock', 'DeveloperStatsBlock', 'DocsCalloutBlock', 'DeveloperCtaBlock'], defaultExpanded: true },
   },
   components: {
     FlexRow: {
@@ -491,6 +491,31 @@ export const builderConfig: Config<any> = {
         }, {});
         return <footer className={`builder-footer-sitemap builder-theme--${theme}`}><div className="builder-footer-sitemap__intro"><p className="builder-kicker">{eyebrow}</p><p className="builder-footer-sitemap__brand">{brand}</p><p className="builder-footer-sitemap__note">{note}</p><a href={`mailto:${email}`}>{email} ↗</a></div><nav className="builder-footer-sitemap__links" aria-label="Site map">{(Object.entries(groups) as [string, { label: string; url: string }[]][]).map(([section, sectionLinks]) => <div key={section}><p>{section}</p>{sectionLinks.map((link, index) => <a href={link.url || '#'} key={`${link.label}-${index}`}>{link.label}<span aria-hidden="true">↗</span></a>)}</div>)}</nav><div className="builder-footer-sitemap__legal"><span>{copyright}</span><span>Built with Open Canvas</span></div></footer>;
       },
+    },
+    HeroLayout: {
+      label: 'Composable hero',
+      fields: {
+        layout: { type: 'radio', label: 'Hero treatment', options: [{ label: 'Split media', value: 'split' }, { label: 'Image overlay', value: 'overlay' }, { label: 'Text only', value: 'text' }] },
+        image: imageField('Hero image'), imageCrop: cropField(), imageAlt: { type: 'text', label: 'Image description' }, imageSide: { type: 'radio', label: 'Media side', options: [{ label: 'Left', value: 'left' }, { label: 'Right', value: 'right' }] },
+        overlay: { type: 'radio', label: 'Image contrast', options: [{ label: 'Soft', value: 'soft' }, { label: 'Strong', value: 'strong' }] },
+        horizontalAlign: { type: 'radio', label: 'Content alignment', options: alignOptions }, verticalAlign: { type: 'radio', label: 'Vertical placement', options: [{ label: 'Top', value: 'start' }, { label: 'Center', value: 'center' }, { label: 'Bottom', value: 'end' }] },
+        theme: { type: 'radio', label: 'Theme', options: themeOptions },
+        content: { type: 'slot', label: 'Hero content', allow: nestedAllowlist },
+      },
+      defaultProps: {
+        layout: 'split', image: '/images/demo-hero.jpg', imageCrop: 'center center', imageAlt: 'Abstract creative studio composition', imageSide: 'right', overlay: 'strong', horizontalAlign: 'left', verticalAlign: 'end', theme: 'paper',
+        content: [
+          { type: 'EyebrowBlock', props: { text: 'Independent creative practice', font: 'inherit', align: 'left', rule: 'none' } },
+          { type: 'HeadingBlock', props: { text: 'MAKE THE IDEA\nIMPOSSIBLE TO IGNORE.', level: 'h1', font: 'inherit', size: 'oversized', tracking: 'tight', align: 'left' } },
+          { type: 'ParagraphBlock', props: { text: 'Build the opener from the same editable blocks used everywhere else.', font: 'inherit', size: 'lead', align: 'left', width: 'normal' } },
+          { type: 'ButtonGroup', props: { align: 'left', gap: 'comfortable', buttons: [{ label: 'See the work', url: '#work', style: 'solid' }, { label: 'Start a conversation', url: '#contact', style: 'outline' }] } },
+        ],
+      },
+      render: ({ layout, image, imageCrop, imageAlt, imageSide, overlay, horizontalAlign, verticalAlign, theme, content: Content }) => <section className={`builder-composable-hero builder-composable-hero--${layout || 'split'} builder-composable-hero--media-${imageSide || 'right'} builder-composable-hero--overlay-${overlay || 'strong'} builder-composable-hero--align-${horizontalAlign || 'left'} builder-composable-hero--vertical-${verticalAlign || 'end'} builder-theme--${theme || 'paper'}`}>
+        {layout !== 'text' && image ? <img className="builder-composable-hero__media" src={image} alt={imageAlt || ''} style={imagePosition(imageCrop)} /> : null}
+        {layout === 'overlay' ? <span className="builder-composable-hero__wash" aria-hidden="true" /> : null}
+        <div className="builder-composable-hero__content">{Content ? <Content className="builder-composable-hero__dropzone" collisionAxis="y" minEmptyHeight={260} /> : null}</div>
+      </section>,
     },
     EditorialHero: {
       label: 'Editorial hero',

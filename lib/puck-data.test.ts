@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Data } from '@puckeditor/core';
 import { normalizeBuilderData } from './puck-data.ts';
+import { heroCompositionTemplate } from './templates.ts';
 
 const brokenNestedData: Data = {
   root: { props: {} },
@@ -79,5 +80,15 @@ test('generates valid unique anchor names and normalizes edited names', () => {
   assert.equal(components[1].props.name, 'photography-film-2');
   assert.match(String(components[2].props.name), /^generated-paragraphblock-[a-z0-9]+$/);
   assert.equal(result.changed, true);
+  assert.equal(normalizeBuilderData(result.data).changed, false);
+});
+
+test('keeps the composable hero template globally identifiable through its nested slot', () => {
+  const result = normalizeBuilderData(heroCompositionTemplate);
+  const ids = collectIds(result.data);
+  const hero = result.data.content?.[0] as { type?: string; props?: Record<string, unknown> };
+  assert.equal(hero.type, 'HeroLayout');
+  assert.equal(hero.props?.layout, 'split');
+  assert.equal(new Set(ids).size, ids.length);
   assert.equal(normalizeBuilderData(result.data).changed, false);
 });
