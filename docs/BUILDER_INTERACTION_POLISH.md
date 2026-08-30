@@ -22,3 +22,12 @@ When a component category gains blocks, keep the nested-layout allowlist in
 `lib/site-builder.tsx` in sync. The existing photo-and-cinema components must
 also be included: they are advertised in the picker and should be valid inside
 layout columns.
+
+## Preserve the editor viewport on drops
+
+Puck manages the active document after it mounts. `EditorClient` still
+normalizes every change before persisting it, but it no longer increments the
+Puck key when normalization repairs the just-added block's anchor. That former
+remount reset the active canvas and sent the editor back to the top. Applying a
+template remains the explicit remount path because it intentionally replaces
+the document.

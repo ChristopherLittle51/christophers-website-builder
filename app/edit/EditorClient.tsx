@@ -59,10 +59,11 @@ export default function EditorClient({ editorName }: { editorName: string }) {
   const handleChange = (nextData: Data) => {
     const normalized = normalizeBuilderData(nextData);
     latestData.current = normalized.data;
-    if (normalized.changed) {
-      setData(normalized.data);
-      setEditorKey((key) => key + 1);
-    }
+    // Puck owns the active editor document after mount. Remounting it just to
+    // persist repaired IDs/anchors discards its current viewport, which made a
+    // newly dropped block jump the editor back to the top. Save the normalized
+    // representation, but leave the mounted editor (and its scroll position)
+    // intact. Template replacement remains the intentional remount path.
     setSaveState('saving');
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => void save(normalized.data, false), 900);
