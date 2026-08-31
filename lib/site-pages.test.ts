@@ -14,4 +14,5 @@ test('migrates the legacy single document into a home page', () => {
 test('creates stable, unique public slugs', () => {
   assert.equal(slugifyPage('About & Process'), 'about-process');
   assert.equal(uniquePageSlug('About', [{ id: 'home', slug: 'home' }, { id: 'about', slug: 'about' }]), 'about-2');
+  assert.equal(uniquePageSlug('Analytics', []), 'analytics-2');
 });

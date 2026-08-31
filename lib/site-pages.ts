@@ -40,7 +40,7 @@ export function uniquePageSlug(requested: string, pages: Pick<SitePage, 'id' | '
   const base = slugifyPage(requested) || 'page';
   let candidate = base;
   let suffix = 2;
-  while (pages.some((page) => page.id !== exceptId && page.slug === candidate)) candidate = `${base}-${suffix++}`;
+  while (candidate === 'analytics' || pages.some((page) => page.id !== exceptId && page.slug === candidate)) candidate = `${base}-${suffix++}`;
   return candidate;
 }
 

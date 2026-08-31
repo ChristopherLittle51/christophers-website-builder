@@ -156,6 +156,7 @@ export default function EditorClient({ editorName }: { editorName: string }) {
         <div className="editor-intro__actions">
           <button type="button" onClick={() => setShowTemplates((open) => !open)}>Templates</button>
           <a href="/" target="_blank">View website ↗</a>
+          <a href="/analytics">Analytics</a>
           <form action="/api/auth/logout" method="post"><button type="submit">Sign out</button></form>
           <span className={`save-state save-state--${saveState}`}>{saveState === 'saving' ? 'Saving…' : saveState === 'published' ? 'Published!' : saveState === 'error' ? 'Save failed' : 'All changes saved'}</span>
         </div>

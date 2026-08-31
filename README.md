@@ -13,6 +13,7 @@ It is a normal Next.js application—not a hosted-platform project. Run it on a 
 - Expandable image grids with editorial, uniform, and filmstrip layouts.
 - Per-field and global font control using nine bundled open-source font families.
 - Custom colors, content widths, corner styles, favicon, Open Graph image, and social copy.
+- A protected first-party analytics suite at `/analytics` with page views, visitors, sources, devices, and 7/30/90-day reporting.
 - Image uploads plus seekable MP4/WebM video hosting with HTTP range responses.
 - YouTube/Vimeo, Calendly, GitHub repository metadata, and sandboxed HTML/CSS/JavaScript blocks.
 - Draft autosave with explicit publishing, so experiments do not immediately change the public site.
@@ -36,6 +37,7 @@ Set `AUTH_SECRET` and `ADMIN_PASSWORD` in `.env`, then open:
 
 - Public site: `http://localhost:3000`
 - Editor: `http://localhost:3000/edit`
+- Analytics: `http://localhost:3000/analytics`
 
 The default `STORAGE_DRIVER=filesystem` writes content and uploads to `./data`. The folder is intentionally gitignored. Draft changes autosave; use **Publish website** to update the public page and its metadata.
 
@@ -147,6 +149,7 @@ Image-bearing components expose a nine-position focal-point control; see [docs/I
 - `docs/RETURN_TO_TOP_BUTTON.md`: root-level Return to top authoring and accessibility contract.
 - `docs/GITHUB_REPOSITORY_BLOCK.md`: GitHub repository block data and authoring contract.
 - `docs/OPERATIONS.md`: deployment, backup, restore, and upgrade guide.
+- `docs/ANALYTICS.md`: first-party analytics event contract, privacy boundary, storage, and dashboard operations.
 
 ## Current scope
 

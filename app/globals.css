@@ -632,6 +632,7 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 .builder-filmstrip h2 { font-size: clamp(38px,10vw,82px); letter-spacing: -.06em; line-height: .9; margin: 0; }
 .builder-filmstrip__track-viewport { overflow: hidden; width: 100%; }
 .builder-filmstrip__track { background: #080808; color: #f5f0df; display: flex; gap: 5px; padding: 28px 18px; position: relative; transform: translate3d(0,0,0); width: max-content; will-change: transform; }
+.builder-filmstrip--static .builder-filmstrip__sticky { height: auto; min-height: 0; padding: 48px 0; position: relative; }
 .builder-filmstrip__track::before,.builder-filmstrip__track::after { background: repeating-linear-gradient(90deg,transparent 0 8px,#e7dec5 8px 22px,transparent 22px 30px); content: ''; height: 13px; left: 0; opacity: .92; position: absolute; right: 0; }
 .builder-filmstrip__track::before { top: 5px; }
 .builder-filmstrip__track::after { bottom: 5px; }

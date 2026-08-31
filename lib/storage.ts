@@ -3,17 +3,19 @@ import 'server-only';
 import {
   GetObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 import { createHash } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
-import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import type { Data } from '@puckeditor/core';
 import type { SitePage } from './site-pages';
+import type { AnalyticsEvent } from './analytics-types';
 
 export type SiteDocument = {
   published: Data;
@@ -46,6 +48,8 @@ export type ByteSlice = { start: number; end: number };
 interface StorageDriver {
   getSite(): Promise<SiteDocument | null>;
   putSite(document: SiteDocument): Promise<void>;
+  getAnalyticsEvents(): Promise<AnalyticsEvent[]>;
+  appendAnalyticsEvent(event: AnalyticsEvent): Promise<void>;
   putMedia(asset: MediaAsset, body: ReadableStream<Uint8Array>): Promise<void>;
   getMedia(id: string): Promise<MediaAsset | null>;
   readMedia(asset: MediaAsset, range?: ByteSlice): Promise<MediaRead | null>;
@@ -91,6 +95,21 @@ class FileStorage implements StorageDriver {
 
   putSite(document: SiteDocument) {
     return this.writeJson('documents/home.json', document);
+  }
+
+  async getAnalyticsEvents() {
+    try {
+      const entries = await readdir(this.resolve('analytics/events'), { recursive: true });
+      const events = await Promise.all(entries.filter((entry) => entry.endsWith('.json')).map((entry) => this.readJson<AnalyticsEvent>(`analytics/events/${entry}`)));
+      return events.filter((event): event is AnalyticsEvent => event !== null);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      throw error;
+    }
+  }
+
+  appendAnalyticsEvent(event: AnalyticsEvent) {
+    return this.writeJson(`analytics/events/${event.createdAt.slice(0, 10)}/${event.id}.json`, event);
   }
 
   async putMedia(asset: MediaAsset, body: ReadableStream<Uint8Array>) {
@@ -173,6 +192,22 @@ class S3Storage implements StorageDriver {
 
   putSite(document: SiteDocument) {
     return this.writeJson('documents/home.json', document);
+  }
+
+  async getAnalyticsEvents() {
+    const events: AnalyticsEvent[] = [];
+    let continuationToken: string | undefined;
+    do {
+      const page = await this.client.send(new ListObjectsV2Command({ Bucket: this.bucket, Prefix: this.key('analytics/events/'), ContinuationToken: continuationToken }));
+      const batch = await Promise.all((page.Contents || []).filter((item) => item.Key?.endsWith('.json')).map((item) => this.readJson<AnalyticsEvent>(item.Key!.slice(this.prefix.length + 1))));
+      events.push(...batch.filter((event): event is AnalyticsEvent => event !== null));
+      continuationToken = page.IsTruncated ? page.NextContinuationToken : undefined;
+    } while (continuationToken && events.length < 100_000);
+    return events;
+  }
+
+  appendAnalyticsEvent(event: AnalyticsEvent) {
+    return this.writeJson(`analytics/events/${event.createdAt.slice(0, 10)}/${event.id}.json`, event);
   }
 
   async putMedia(asset: MediaAsset, body: ReadableStream<Uint8Array>) {
