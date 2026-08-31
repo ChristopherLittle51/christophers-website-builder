@@ -285,7 +285,9 @@ function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: 
     };
     const measure = () => {
       distance = Math.max(0, track.scrollWidth - section.clientWidth);
-      const hasOverflow = distance > 0;
+      // Two or three editorial frames can be wider than a narrow viewport, but
+      // should remain a normal section rather than hijacking page scroll.
+      const hasOverflow = frames.length >= 4 && distance > 0;
       setHasHorizontalOverflow(hasOverflow);
       setScrollHeight(hasOverflow ? window.innerHeight + distance : undefined);
       if (hasOverflow) requestUpdate();
