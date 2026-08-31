@@ -5,6 +5,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 import { buildCalendlyEmbedUrl } from './embed-utils';
 import { formatGitHubCount, formatGitHubDate, parseGitHubRepository } from './github';
+import { FONT_FAMILIES, FONT_OPTIONS, typographyFields, typographyStyle } from './typography';
 
 declare global {
   interface Window {
@@ -15,18 +16,6 @@ declare global {
 }
 
 type MediaFieldProps = { label: string; value: string; onChange: (value: string) => void; readOnly?: boolean; kind: 'image' | 'video' };
-
-const FONT_OPTIONS = [
-  ['Inter — precise sans', 'inter'], ['Manrope — warm geometric', 'manrope'], ['Space Grotesk — graphic sans', 'space-grotesk'],
-  ['DM Sans — clean editorial', 'dm-sans'], ['Bricolage Grotesque — expressive', 'bricolage'], ['Playfair Display — high contrast serif', 'playfair'],
-  ['Cormorant Garamond — artful serif', 'cormorant'], ['Fraunces — character serif', 'fraunces'], ['IBM Plex Mono — technical mono', 'ibm-plex-mono'],
-].map(([label, value]) => ({ label, value }));
-
-const FONT_FAMILIES: Record<string, string> = {
-  inter: '"Inter Variable", Arial, sans-serif', manrope: '"Manrope Variable", Arial, sans-serif', 'space-grotesk': '"Space Grotesk Variable", Arial, sans-serif',
-  'dm-sans': '"DM Sans Variable", Arial, sans-serif', bricolage: '"Bricolage Grotesque Variable", Arial, sans-serif', playfair: '"Playfair Display Variable", Georgia, serif',
-  cormorant: '"Cormorant Garamond Variable", Georgia, serif', fraunces: '"Fraunces Variable", Georgia, serif', 'ibm-plex-mono': '"IBM Plex Mono", ui-monospace, monospace',
-};
 
 const fontField = (label: string) => ({ type: 'select' as const, label, options: [{ label: 'Use site default', value: 'inherit' }, ...FONT_OPTIONS] });
 const directFontField = (label: string) => ({ type: 'select' as const, label, options: FONT_OPTIONS });
@@ -85,6 +74,22 @@ const nestedAllowlist = [
 const typeClass = (prefix: string, size = 'standard', tracking = 'tight') => `${prefix} ${prefix}--size-${size} ${prefix}--tracking-${tracking}`;
 const sectionNameField = { type: 'text' as const, label: 'Section link name', description: 'Use this name in links like #photography.' };
 const imagePosition = (crop?: string): CSSProperties => ({ objectPosition: crop || 'center center' });
+type ReturnToTopButtonProps = { enabled: boolean; label: string; appearance: string; position: string; isEditing: boolean };
+
+function ReturnToTopButton({ enabled, label, appearance, position, isEditing }: ReturnToTopButtonProps) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const updateVisibility = () => setIsVisible(window.scrollY > 320);
+    updateVisibility();
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+    return () => window.removeEventListener('scroll', updateVisibility);
+  }, []);
+
+  if (!enabled || isEditing || !isVisible) return null;
+
+  return <button type="button" className={`builder-return-to-top builder-return-to-top--${appearance || 'ink'} builder-return-to-top--${position || 'right'}`} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label={label || 'Return to top'}><span aria-hidden="true">↑</span>{label || 'Return to top'}</button>;
+}
 const stableNameHash = (value: string) => {
   let hash = 2166136261;
   for (let index = 0; index < value.length; index += 1) {
@@ -114,6 +119,18 @@ function withSectionAnchor(render: (props: any) => ReactNode): any {
   };
 }
 
+// Every block gets an optional, block-wide override so text nested in repeaters
+// and helper renderers can be styled without changing the authored content.
+function withTypographyOverride(render: (props: any) => ReactNode): any {
+  return (props: any) => {
+    const rendered = render(props);
+    if (!isValidElement(rendered)) return rendered;
+    const typography = typographyStyle({ font: props.typographyFont, fontWeight: props.typographyFontWeight, fontStyle: props.typographyFontStyle, letterSpacing: props.typographyLetterSpacing, wordSpacing: props.typographyWordSpacing, lineHeight: props.typographyLineHeight, textDecoration: props.typographyTextDecoration, textTransform: props.typographyTextTransform, fontKerning: props.typographyFontKerning });
+    const hasOverride = Object.keys(typography).length > 0;
+    return cloneElement(rendered as ReactElement<any>, { className: `${(rendered.props as { className?: string }).className || ''}${hasOverride ? ' builder-typography-overrides' : ''}`.trim(), style: { ...((rendered.props as { style?: CSSProperties }).style || {}), ...typography } });
+  };
+}
+
 function BeforeAfterView({ before, after, beforeAlt, afterAlt, beforeCrop, afterCrop, label }: { before: string; after: string; beforeAlt: string; afterAlt: string; beforeCrop?: string; afterCrop?: string; label: ReactNode }) {
   const [position, setPosition] = useState(50);
   return <section className="builder-compare"><div className="builder-compare__heading"><h2>{label}</h2><span>{position}%</span></div><div className="builder-compare__stage">
@@ -121,9 +138,9 @@ function BeforeAfterView({ before, after, beforeAlt, afterAlt, beforeCrop, after
   </div><label className="builder-compare__control"><span>Before</span><input aria-label="Compare before and after images" type="range" min="0" max="100" value={position} onChange={(event) => setPosition(Number(event.target.value))} /><span>After</span></label></section>;
 }
 
-function HeadingPrimitive({ level, text, font, size, tracking, align }: { level: string; text: ReactNode; font: string; size: string; tracking: string; align: string }) {
+function HeadingPrimitive({ level, text, font, size, tracking, align, fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight }: { level: string; text: ReactNode; font: string; size: string; tracking: string; align: string; fontWeight?: string; fontStyle?: string; letterSpacing?: string; wordSpacing?: string; lineHeight?: string }) {
   const Tag = (['h1', 'h2', 'h3'].includes(level) ? level : 'h2') as 'h1' | 'h2' | 'h3';
-  return <Tag className={`builder-heading builder-heading--${size} builder-heading--tracking-${tracking} builder-align--${align}`} style={fontStyle(font)}>{text}</Tag>;
+  return <Tag className={`builder-heading builder-heading--${size} builder-heading--tracking-${tracking} builder-align--${align}`} style={{ ...fontStyle(font), ...typographyStyle({ fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight }) }}>{text}</Tag>;
 }
 
 function videoEmbedUrl(rawUrl: string) {
@@ -544,15 +561,15 @@ export const builderConfig: Config<any> = {
     },
     HeadingBlock: {
       label: 'Heading',
-      fields: { text: { type: 'textarea', label: 'Heading', contentEditable: true }, level: { type: 'radio', label: 'Semantic level', options: [{ label: 'H1', value: 'h1' }, { label: 'H2', value: 'h2' }, { label: 'H3', value: 'h3' }] }, font: fontField('Font'), size: { type: 'select', label: 'Size', options: sizeOptions }, tracking: { type: 'select', label: 'Letter spacing', options: trackingOptions }, align: { type: 'radio', label: 'Alignment', options: alignOptions } },
+      fields: { text: { type: 'textarea', label: 'Heading', contentEditable: true }, level: { type: 'radio', label: 'Semantic level', options: [{ label: 'H1', value: 'h1' }, { label: 'H2', value: 'h2' }, { label: 'H3', value: 'h3' }] }, ...typographyFields('', 'Heading'), size: { type: 'select', label: 'Size', options: sizeOptions }, tracking: { type: 'select', label: 'Legacy tracking', options: trackingOptions }, align: { type: 'radio', label: 'Alignment', options: alignOptions } },
       defaultProps: { text: 'A clear point of view.', level: 'h2', font: 'inherit', size: 'standard', tracking: 'tight', align: 'left' },
       render: (props) => <HeadingPrimitive {...(props as unknown as Parameters<typeof HeadingPrimitive>[0])} />,
     },
     ParagraphBlock: {
       label: 'Paragraph',
-      fields: { text: { type: 'textarea', label: 'Text', contentEditable: true }, font: fontField('Font'), size: { type: 'radio', label: 'Size', options: [{ label: 'Small', value: 'small' }, { label: 'Standard', value: 'standard' }, { label: 'Lead', value: 'lead' }] }, align: { type: 'radio', label: 'Alignment', options: alignOptions }, width: { type: 'radio', label: 'Line length', options: [{ label: 'Narrow', value: 'narrow' }, { label: 'Normal', value: 'normal' }, { label: 'Wide', value: 'wide' }] } },
+      fields: { text: { type: 'textarea', label: 'Text', contentEditable: true }, ...typographyFields('', 'Text'), size: { type: 'radio', label: 'Size', options: [{ label: 'Small', value: 'small' }, { label: 'Standard', value: 'standard' }, { label: 'Lead', value: 'lead' }] }, align: { type: 'radio', label: 'Alignment', options: alignOptions }, width: { type: 'radio', label: 'Line length', options: [{ label: 'Narrow', value: 'narrow' }, { label: 'Normal', value: 'normal' }, { label: 'Wide', value: 'wide' }] } },
       defaultProps: { text: 'Use a paragraph block for flexible body copy inside a custom layout.', font: 'inherit', size: 'standard', align: 'left', width: 'normal' },
-      render: ({ text, font, size, align, width }) => <p className={`builder-paragraph builder-paragraph--${size} builder-paragraph--${align} builder-paragraph--${width}`} style={fontStyle(font)}>{text}</p>,
+      render: ({ text, font, size, align, width, fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight }) => <p className={`builder-paragraph builder-paragraph--${size} builder-paragraph--${align} builder-paragraph--${width}`} style={{ ...fontStyle(font), ...typographyStyle({ fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight }) }}>{text}</p>,
     },
     EyebrowBlock: {
       label: 'Eyebrow / label',
@@ -859,11 +876,11 @@ export const builderConfig: Config<any> = {
     },
   },
   root: {
-    fields: { title: { type: 'text', label: 'Browser title' }, favicon: imageField('Favicon (use a square image)'), socialTitle: { type: 'text', label: 'Social sharing title' }, socialDescription: { type: 'textarea', label: 'Social sharing description' }, socialImage: imageField('Social preview image (wide, ideally 1.91:1)'), socialImageAlt: { type: 'text', label: 'Social preview image description' }, displayFont: directFontField('Display / headline font'), bodyFont: directFontField('Body font'), accentFont: directFontField('Accent / caption font'), headingStyle: { type: 'radio', label: 'Heading weight', options: [{ label: 'Bold', value: 'bold' }, { label: 'Regular', value: 'classic' }, { label: 'Mixed', value: 'mixed' }] }, paperColor: colorField('Background color'), inkColor: colorField('Text color'), accentColor: colorField('Accent color'), contentWidth: { type: 'radio', label: 'Page width', options: [{ label: 'Focused', value: 'focused' }, { label: 'Standard', value: 'standard' }, { label: 'Full bleed', value: 'full' }] }, corners: { type: 'radio', label: 'Image corners', options: [{ label: 'Sharp', value: 'sharp' }, { label: 'Soft', value: 'soft' }, { label: 'Round', value: 'round' }] } },
-    defaultProps: { title: 'Studio Name — Creative Portfolio', favicon: '/favicon.svg', socialTitle: 'Studio Name — Creative Portfolio', socialDescription: 'Selected creative work, process, and ways to collaborate.', socialImage: '/og.png', socialImageAlt: 'Studio Name creative portfolio social preview', displayFont: 'space-grotesk', bodyFont: 'inter', accentFont: 'fraunces', headingStyle: 'bold', paperColor: '#f7f7f3', inkColor: '#050505', accentColor: '#d8ff00', contentWidth: 'full', corners: 'sharp' },
-    render: ({ children, displayFont = 'space-grotesk', bodyFont = 'inter', accentFont = 'fraunces', headingStyle = 'bold', paperColor = '#f7f7f3', inkColor = '#050505', accentColor = '#d8ff00', contentWidth = 'full', corners = 'sharp' }) => {
+    fields: { title: { type: 'text', label: 'Browser title' }, favicon: imageField('Favicon (use a square image)'), socialTitle: { type: 'text', label: 'Social sharing title' }, socialDescription: { type: 'textarea', label: 'Social sharing description' }, socialImage: imageField('Social preview image (wide, ideally 1.91:1)'), socialImageAlt: { type: 'text', label: 'Social preview image description' }, displayFont: directFontField('Display / headline font'), bodyFont: directFontField('Body font'), accentFont: directFontField('Accent / caption font'), headingStyle: { type: 'radio', label: 'Heading weight', options: [{ label: 'Bold', value: 'bold' }, { label: 'Regular', value: 'classic' }, { label: 'Mixed', value: 'mixed' }] }, paperColor: colorField('Background color'), inkColor: colorField('Text color'), accentColor: colorField('Accent color'), contentWidth: { type: 'radio', label: 'Page width', options: [{ label: 'Focused', value: 'focused' }, { label: 'Standard', value: 'standard' }, { label: 'Full bleed', value: 'full' }] }, corners: { type: 'radio', label: 'Image corners', options: [{ label: 'Sharp', value: 'sharp' }, { label: 'Soft', value: 'soft' }, { label: 'Round', value: 'round' }] }, returnToTop: { type: 'radio', label: 'Return to top button', options: [{ label: 'Hidden', value: 'hidden' }, { label: 'Show on scroll', value: 'show' }] }, returnToTopLabel: { type: 'text', label: 'Return to top label' }, returnToTopAppearance: { type: 'radio', label: 'Return to top style', options: [{ label: 'Ink', value: 'ink' }, { label: 'Accent', value: 'accent' }, { label: 'Outline', value: 'outline' }] }, returnToTopPosition: { type: 'radio', label: 'Return to top position', options: [{ label: 'Right', value: 'right' }, { label: 'Left', value: 'left' }] } },
+    defaultProps: { title: 'Studio Name — Creative Portfolio', favicon: '/favicon.svg', socialTitle: 'Studio Name — Creative Portfolio', socialDescription: 'Selected creative work, process, and ways to collaborate.', socialImage: '/og.png', socialImageAlt: 'Studio Name creative portfolio social preview', displayFont: 'space-grotesk', bodyFont: 'inter', accentFont: 'fraunces', headingStyle: 'bold', paperColor: '#f7f7f3', inkColor: '#050505', accentColor: '#d8ff00', contentWidth: 'full', corners: 'sharp', returnToTop: 'hidden', returnToTopLabel: 'Return to top', returnToTopAppearance: 'ink', returnToTopPosition: 'right' },
+    render: ({ children, displayFont = 'space-grotesk', bodyFont = 'inter', accentFont = 'fraunces', headingStyle = 'bold', paperColor = '#f7f7f3', inkColor = '#050505', accentColor = '#d8ff00', contentWidth = 'full', corners = 'sharp', returnToTop = 'hidden', returnToTopLabel = 'Return to top', returnToTopAppearance = 'ink', returnToTopPosition = 'right', puck }) => {
       const style = { '--site-paper': paperColor, '--site-ink': inkColor, '--site-accent': accentColor, '--font-display': FONT_FAMILIES[displayFont], '--font-body': FONT_FAMILIES[bodyFont], '--font-accent': FONT_FAMILIES[accentFont] } as CSSProperties;
-      return <div className={`site-canvas site-heading--${headingStyle} site-width--${contentWidth} site-corners--${corners}`} style={style}>{children}</div>;
+      return <div className={`site-canvas site-heading--${headingStyle} site-width--${contentWidth} site-corners--${corners}`} style={style}>{children}<ReturnToTopButton enabled={returnToTop === 'show'} label={returnToTopLabel} appearance={returnToTopAppearance} position={returnToTopPosition} isEditing={Boolean(puck?.isEditing)} /></div>;
     },
   },
 };
@@ -874,6 +891,10 @@ export const builderConfig: Config<any> = {
 for (const [componentType, component] of Object.entries(builderConfig.components)) {
   component.fields = { name: sectionNameField, ...component.fields };
   component.render = withSectionAnchor(component.render);
+  if (componentType !== 'LayoutContainer' && componentType !== 'FlexRow' && componentType !== 'FlexColumn' && componentType !== 'InsetContainer') {
+    component.fields = { ...component.fields, ...typographyFields('typography', 'Block typography override') };
+    component.render = withTypographyOverride(component.render);
+  }
   component.resolveData = ({ props }: { props: Record<string, unknown> }) => {
     const name = typeof props.name === 'string' ? props.name.trim() : '';
     if (name) return { props };

@@ -17,6 +17,10 @@ const root = (title: string, accentColor: string, displayFont = 'space-grotesk',
     accentColor,
     contentWidth: 'full',
     corners: 'sharp',
+    returnToTop: 'hidden',
+    returnToTopLabel: 'Return to top',
+    returnToTopAppearance: 'ink',
+    returnToTopPosition: 'right',
   },
 });
 

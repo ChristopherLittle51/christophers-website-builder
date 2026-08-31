@@ -12,6 +12,26 @@ import '@fontsource-variable/fraunces';
 import '@fontsource-variable/bricolage-grotesque';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/600.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/700.css';
+import '@fontsource/open-sans/400.css';
+import '@fontsource/open-sans/700.css';
+import '@fontsource/lato/400.css';
+import '@fontsource/lato/700.css';
+import '@fontsource/montserrat/400.css';
+import '@fontsource/montserrat/700.css';
+import '@fontsource/oswald/400.css';
+import '@fontsource/oswald/700.css';
+import '@fontsource/raleway/400.css';
+import '@fontsource/raleway/700.css';
+import '@fontsource/libre-baskerville/400.css';
+import '@fontsource/libre-baskerville/700.css';
+import '@fontsource/source-code-pro/400.css';
+import '@fontsource/source-code-pro/700.css';
+import '@fontsource/nunito/400.css';
+import '@fontsource/nunito/700.css';
+import '@fontsource/archivo/400.css';
+import '@fontsource/archivo/700.css';
 import './globals.css';
 
 function siteUrl() {

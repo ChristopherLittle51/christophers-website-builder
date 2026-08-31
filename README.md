@@ -17,6 +17,7 @@ It is a normal Next.js application—not a hosted-platform project. Run it on a 
 - YouTube/Vimeo, Calendly, GitHub repository metadata, and sandboxed HTML/CSS/JavaScript blocks.
 - Draft autosave with explicit publishing, so experiments do not immediately change the public site.
 - Editable section link names, so links such as `#photography` scroll visitors to a chosen block.
+- Optional, scroll-aware Return to top control with editable label, style, and side.
 - Password-protected editor sessions signed with HMAC.
 - Filesystem and S3-compatible storage drivers.
 - Production Docker image and Compose setup.
@@ -143,6 +144,7 @@ Image-bearing components expose a nine-position focal-point control; see [docs/I
 - `lib/media.ts`: upload rules and HTTP byte-range parsing.
 - `docs/ARCHITECTURE.md`: contracts and extension points.
 - `docs/NAVIGATION_COMPONENTS.md`: header/link bar and footer/site map field contracts.
+- `docs/RETURN_TO_TOP_BUTTON.md`: root-level Return to top authoring and accessibility contract.
 - `docs/GITHUB_REPOSITORY_BLOCK.md`: GitHub repository block data and authoring contract.
 - `docs/OPERATIONS.md`: deployment, backup, restore, and upgrade guide.
 
