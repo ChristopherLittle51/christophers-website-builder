@@ -268,7 +268,8 @@ function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: 
     const section = sectionRef.current;
     const sticky = stickyRef.current;
     const track = trackRef.current;
-    if (!section || !sticky || !track || direction === 'vertical' || isEditing) {
+    const viewport = track?.parentElement;
+    if (!section || !sticky || !track || !viewport || direction === 'vertical' || isEditing) {
       setScrollHeight(undefined);
       setHasHorizontalOverflow(false);
       if (track) track.style.transform = '';
@@ -286,19 +287,25 @@ function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: 
       if (!frame) frame = window.requestAnimationFrame(update);
     };
     const measure = () => {
-      distance = Math.max(0, track.scrollWidth - section.clientWidth);
-      // Two or three editorial frames can be wider than a narrow viewport, but
-      // should remain a normal section rather than hijacking page scroll.
-      const hasOverflow = frames.length >= 4 && distance > 0;
+      // Stop at the last photo, not the track's padded/intrinsic scroll box.
+      // Both rectangles include the current translation, which cancels out.
+      const lastPhoto = track.lastElementChild?.querySelector('img');
+      const photoEnd = lastPhoto
+        ? lastPhoto.getBoundingClientRect().right - track.getBoundingClientRect().left
+        : 0;
+      distance = Math.max(0, photoEnd - viewport.clientWidth);
+      const hasOverflow = distance > 0;
       setHasHorizontalOverflow(hasOverflow);
-      setScrollHeight(hasOverflow ? sticky.offsetHeight + distance : undefined);
-      if (hasOverflow) requestUpdate();
-      else track.style.transform = '';
+      setScrollHeight(hasOverflow ? sticky.getBoundingClientRect().height + distance : undefined);
+      requestUpdate();
     };
 
     const observer = new ResizeObserver(measure);
     observer.observe(section);
+    observer.observe(sticky);
+    observer.observe(viewport);
     observer.observe(track);
+    for (const photo of track.querySelectorAll('img')) observer.observe(photo);
     window.addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', measure);
     measure();

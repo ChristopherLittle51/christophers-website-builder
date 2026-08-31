@@ -23,7 +23,20 @@ The blocks reuse the site-level display, body, and accent fonts plus `--site-pap
 
 All layouts are mobile-first. Multi-column contact sheets, storyboards, grade comparisons, slate layouts, and film-stock details collapse to a single readable flow on narrow screens. `prefers-reduced-motion` continues to use the project-wide motion override.
 
-The horizontal film strip measures its rendered track and turns that overflow distance into vertical page space only for a full sequence of four or more frames. On the published page, its stage sticks at the top of the viewport while vertical scrolling advances the frames horizontally, then releases when the last frame has crossed. One to three frames always keep their natural document height, even if their rendered width exceeds a narrow viewport: no sticky stage, no reserved scroll distance, and no horizontal movement through empty track space. In the Puck editor it remains a conventional horizontally scrollable strip so its controls and neighboring blocks stay easy to reach. The vertical strip option retains its natural stacked layout.
+The horizontal film strip measures the right edge of the last rendered photo relative to the track's origin. Its travel is exactly the part of that edge beyond the visible strip width; trailing padding and decorative track space never add travel. The translation is clamped to this distance, so the last photo finishes flush with the strip viewport's right edge and cannot scroll past it.
+
+On the published page, the content-height stage sticks while vertical scrolling advances the frames horizontally. The section height is the measured stage height plus that exact travel distance, with no added viewport. Any number of photos can scroll when necessary; photos that fit have zero travel and remain in normal document flow. The former four-frame threshold was removed because photo count does not determine overflow and the old scroll listener still moved supposedly static strips.
+
+Frame widths are explicit and captions wrap inside them, so image intrinsic dimensions and long captions cannot create an oversized empty track. Resize observation covers the stage, viewport, track, and images to remeasure after image loading, font/layout changes, and responsive resizing. In the Puck editor the strip uses native horizontal scrolling. The vertical option keeps its natural stacked layout.
+
+### Scroll regression checks
+
+Use a local fixture with a section before and after the strip; do not change a saved or published portfolio document for testing. Check the real browser layout after images load, not just a build or data-normalization test.
+
+- For overflowing strips, scroll beyond the horizontal interval. The last image's `getBoundingClientRect().right` must equal the track viewport's right edge, and further page scrolling must not change the final horizontal translation.
+- For fitting or empty strips, the section and stage heights must match and translation must be zero, including after removing frames or widening the viewport.
+- The scroll interval must equal `max(0, lastPhotoRight - trackLeft - viewportWidth)`. Do not use `scrollWidth` or add a viewport-sized minimum.
+- Verified on 2026-08-31 with four desktop photos and two/twelve photos at a 390px viewport: end-gap was 0px in each case. One-photo and empty cases reset to 0px travel after removing photos. Source and downstream builds are separate from these browser checks.
 
 ## Showcase template
 
