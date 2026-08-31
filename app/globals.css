@@ -627,7 +627,7 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 /* Photography and cinema blocks share a restrained production-design language. */
 .builder-filmstrip,.builder-slate-section,.builder-lens-hero,.builder-reel-showcase,.builder-color-grade { background: var(--block-bg); color: var(--block-ink); }
 .builder-filmstrip { overflow: clip; position: relative; }
-.builder-filmstrip__sticky { align-content: center; background: var(--block-bg); color: var(--block-ink); display: grid; height: 100svh; overflow: hidden; position: sticky; top: 0; }
+.builder-filmstrip__sticky { align-content: center; background: var(--block-bg); color: var(--block-ink); display: grid; overflow: hidden; padding: 48px 0; position: sticky; top: 0; }
 .builder-filmstrip header { align-items: end; display: flex; justify-content: space-between; padding: 24px 18px; }
 .builder-filmstrip h2 { font-size: clamp(38px,10vw,82px); letter-spacing: -.06em; line-height: .9; margin: 0; }
 .builder-filmstrip__track-viewport { overflow: hidden; width: 100%; }

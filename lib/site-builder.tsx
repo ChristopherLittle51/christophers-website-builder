@@ -259,14 +259,16 @@ type FilmStripFrame = { image: string; crop?: string; alt: string; caption: stri
 
 function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: { title: ReactNode; stock: ReactNode; direction: string; frames: FilmStripFrame[]; theme: string; isEditing: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [scrollHeight, setScrollHeight] = useState<number>();
   const [hasHorizontalOverflow, setHasHorizontalOverflow] = useState(false);
 
   useEffect(() => {
     const section = sectionRef.current;
+    const sticky = stickyRef.current;
     const track = trackRef.current;
-    if (!section || !track || direction === 'vertical' || isEditing) {
+    if (!section || !sticky || !track || direction === 'vertical' || isEditing) {
       setScrollHeight(undefined);
       setHasHorizontalOverflow(false);
       if (track) track.style.transform = '';
@@ -289,7 +291,7 @@ function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: 
       // should remain a normal section rather than hijacking page scroll.
       const hasOverflow = frames.length >= 4 && distance > 0;
       setHasHorizontalOverflow(hasOverflow);
-      setScrollHeight(hasOverflow ? window.innerHeight + distance : undefined);
+      setScrollHeight(hasOverflow ? sticky.offsetHeight + distance : undefined);
       if (hasOverflow) requestUpdate();
       else track.style.transform = '';
     };
@@ -309,7 +311,7 @@ function ScrollFilmStrip({ title, stock, direction, frames, theme, isEditing }: 
     };
   }, [direction, frames, isEditing]);
 
-  return <section ref={sectionRef} className={`builder-filmstrip builder-filmstrip--${direction}${!hasHorizontalOverflow ? ' builder-filmstrip--static' : ''}${isEditing ? ' builder-filmstrip--editing' : ''} builder-theme--${theme}`} style={scrollHeight ? { height: scrollHeight } : undefined}><div className="builder-filmstrip__sticky"><header><p className="builder-kicker">{stock}</p><h2>{title}</h2></header><div className="builder-filmstrip__track-viewport"><div className="builder-filmstrip__track" ref={trackRef}>{(frames || []).map((filmFrame, index) => <figure key={`${filmFrame.image}-${index}`}><span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><img src={filmFrame.image} alt={filmFrame.alt || ''} style={imagePosition(filmFrame.crop)} /><figcaption>{filmFrame.caption}</figcaption></figure>)}</div></div></div></section>;
+  return <section ref={sectionRef} className={`builder-filmstrip builder-filmstrip--${direction}${!hasHorizontalOverflow ? ' builder-filmstrip--static' : ''}${isEditing ? ' builder-filmstrip--editing' : ''} builder-theme--${theme}`} style={scrollHeight ? { height: scrollHeight } : undefined}><div className="builder-filmstrip__sticky" ref={stickyRef}><header><p className="builder-kicker">{stock}</p><h2>{title}</h2></header><div className="builder-filmstrip__track-viewport"><div className="builder-filmstrip__track" ref={trackRef}>{(frames || []).map((filmFrame, index) => <figure key={`${filmFrame.image}-${index}`}><span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><img src={filmFrame.image} alt={filmFrame.alt || ''} style={imagePosition(filmFrame.crop)} /><figcaption>{filmFrame.caption}</figcaption></figure>)}</div></div></div></section>;
 }
 
 // Puck component props intentionally remain open-ended: templates are user data,
