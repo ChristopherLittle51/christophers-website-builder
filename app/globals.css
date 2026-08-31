@@ -169,9 +169,8 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 .builder-theme--lime { --block-bg: var(--site-accent,#d8ff00); --block-ink: var(--site-ink,#050505); }
 .builder-header-bar { align-items: start; background: var(--block-bg); color: var(--block-ink); display: grid; gap: 12px; grid-template-columns: minmax(0,1fr); min-width: 0; padding: 16px 18px; position: relative; z-index: 2; }
 .builder-header-bar__brand { font-family: var(--font-display); font-size: clamp(17px,5vw,24px); font-weight: 800; letter-spacing: -.06em; line-height: .95; max-width: 100%; overflow-wrap: anywhere; }
-.builder-header-bar nav { align-items: center; display: flex; gap: 20px; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 18px 2px 0; scroll-padding-inline: 0 18px; scroll-snap-type: x proximity; scrollbar-width: none; touch-action: pan-x; -webkit-overflow-scrolling: touch; width: calc(100% + 18px); }
-.builder-header-bar nav::-webkit-scrollbar { display: none; }
-.builder-header-bar nav a { align-items: center; border-bottom: 1px solid transparent; display: inline-flex; flex: 0 0 auto; font: 700 10px/1 var(--font-accent,var(--font-body)); letter-spacing: .1em; min-height: 44px; scroll-snap-align: start; text-transform: uppercase; }
+.builder-header-bar nav { align-items: center; display: flex; flex-wrap: wrap; gap: 0 18px; min-width: 0; width: 100%; }
+.builder-header-bar nav a { align-items: center; border-bottom: 1px solid transparent; display: inline-flex; flex: 0 0 auto; font: 700 10px/1 var(--font-accent,var(--font-body)); letter-spacing: .1em; min-height: 40px; text-transform: uppercase; }
 .builder-header-bar nav a:hover,.builder-header-bar nav a:focus-visible { border-color: currentColor; }
 .builder-header-bar.builder-theme--black { border-bottom: 1px solid rgba(255,255,255,.2); }
 .builder-header-bar.builder-theme--paper,.builder-header-bar.builder-theme--lime { border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent); }
@@ -758,7 +757,7 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 @media (min-width: 700px) {
   .builder-header-bar { align-items: center; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; padding: 20px 4vw; }
   .builder-header-bar__brand { flex: 1 1 240px; font-size: clamp(19px,2.2vw,30px); }
-  .builder-header-bar nav { flex: 1 1 400px; justify-content: flex-end; max-width: 100%; padding: 0; scroll-snap-type: none; width: auto; }
+  .builder-header-bar nav { flex: 1 1 400px; justify-content: flex-end; max-width: 100%; width: auto; }
   .builder-header-bar nav { gap: 28px; }
   .builder-footer-sitemap { gap: 70px 8vw; grid-template-columns: minmax(0,1.15fr) minmax(280px,.85fr); padding: 110px 4vw 24px; }
   .builder-footer-sitemap__links { border-top: 0; padding-top: 0; grid-template-columns: repeat(2,minmax(0,1fr)); }
