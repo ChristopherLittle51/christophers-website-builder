@@ -4,7 +4,7 @@ Open Canvas includes two reusable navigation blocks in `lib/site-builder.tsx`:
 
 ## Header / link bar
 
-`HeaderLinkBar` renders a semantic `<header>` with an editable brand link and a repeatable horizontal navigation list. Each link accepts a label and either a normal URL or an in-page anchor such as `#work`. On narrow screens the brand gets its own row and long titles can wrap at safe word boundaries; the link row remains horizontally scrollable. At desktop widths the brand and links return to one row, with the brand capped so it cannot crowd the navigation. The block supports the shared `paper`, `black`, and `lime` themes.
+`HeaderLinkBar` renders a semantic `<header>` with an editable brand link and a repeatable horizontal navigation list. Each link accepts a label and either a normal URL or an in-page anchor such as `#work`. On narrow screens the brand gets its own row and long titles can wrap at safe word boundaries; the link row remains horizontally scrollable, has 44px touch targets, and reserves a trailing edge so its last link can be fully scrolled into view. It uses touch-first horizontal panning and proximity snapping, which makes a longer list easy to browse without forcing links to wrap into unpredictable rows. At desktop widths the brand and links return to one row, with the brand capped so it cannot crowd the navigation. The block supports the shared `paper`, `black`, and `lime` themes.
 
 ## Footer / site map
 
@@ -16,4 +16,4 @@ When adding anchors to a page, give the destination block a unique **Section lin
 
 ## Verification
 
-Check the blocks in Puck at the existing Phone (390px), Tablet (768px), and Desktop (1280px) viewports. Confirm that mobile header links remain reachable by horizontal scrolling, footer groups preserve their order, and anchor links target the intended named block after save and reload.
+Check the blocks in Puck at the existing Phone (390px), Tablet (768px), and Desktop (1280px) viewports. At the Phone viewport, confirm a long brand wraps without horizontal page overflow, every nav link keeps a 44px tap target, and the final navigation link can scroll fully into view. Confirm that the desktop header remains a single row with right-aligned navigation, footer groups preserve their order, and anchor links target the intended named block after save and reload.
