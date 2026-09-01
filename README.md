@@ -132,6 +132,10 @@ npm run build
 
 Focused tests cover Calendly URL constraints, upload policy and byte ranges, published metadata normalization, and recursive Puck identity repair. The GitHub Actions workflow runs the same test and build commands.
 
+### Paragraph line breaks
+
+Paragraph text is stored as a string, including any newline characters entered in the editor. The published renderer preserves those authored line breaks through the shared `.builder-paragraph` rule in `app/globals.css`; `white-space: pre-line` keeps line breaks while still collapsing incidental runs of spaces. Keep this rule on the public paragraph class when changing the paragraph component or its layout wrappers, and verify a saved paragraph with at least two lines on both the editor and published routes.
+
 Project map:
 
 - `app/`: public renderer, protected editor, auth, content, and media routes.

@@ -500,7 +500,7 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 .builder-heading--tracking-natural { letter-spacing: -.02em; }
 .builder-heading--tracking-wide { letter-spacing: .025em; }
 .builder-typography-overrides > *,.builder-typography-overrides h1,.builder-typography-overrides h2,.builder-typography-overrides h3,.builder-typography-overrides h4,.builder-typography-overrides h5,.builder-typography-overrides h6,.builder-typography-overrides p,.builder-typography-overrides span,.builder-typography-overrides strong,.builder-typography-overrides em,.builder-typography-overrides small,.builder-typography-overrides a,.builder-typography-overrides li,.builder-typography-overrides dt,.builder-typography-overrides dd,.builder-typography-overrides figcaption,.builder-typography-overrides cite,.builder-typography-overrides time,.builder-typography-overrides code,.builder-typography-overrides pre,.builder-typography-overrides summary,.builder-typography-overrides label { font-family: inherit !important; font-weight: inherit !important; font-style: inherit !important; letter-spacing: inherit !important; word-spacing: inherit !important; line-height: inherit !important; text-decoration: inherit !important; text-transform: inherit !important; font-kerning: inherit !important; }
-.builder-paragraph { font-size: 18px; line-height: 1.45; margin: 0; padding: 18px; }
+.builder-paragraph { font-size: 18px; line-height: 1.45; margin: 0; padding: 18px; white-space: pre-line; }
 .builder-paragraph--small { font-size: 14px; }
 .builder-paragraph--lead { font-size: clamp(22px,5vw,36px); line-height: 1.2; }
 .builder-paragraph--center { margin-inline: auto; text-align: center; }
