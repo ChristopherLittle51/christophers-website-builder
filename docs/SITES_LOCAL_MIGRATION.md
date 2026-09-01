@@ -12,7 +12,7 @@ The endpoint uses the deployment's normal editor authorization. In the self-host
 
 1. Stop editing briefly, or record a cutoff time and repeat the export after the last edit.
 2. Sign in to the editor.
-3. Open `/api/export` on the same origin and save the JSON response.
+3. Open `/api/export?download=1` on the same origin and save the JSON response. `/api/export` renders the same authenticated JSON inline for inspection and automation.
 4. Record the export timestamp, site version, media count, and total `size` values.
 
 The manifest enumerates `media_assets`, not just URLs found in the current page. This preserves uploaded but currently unused images and videos.

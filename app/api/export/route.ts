@@ -24,10 +24,9 @@ export async function GET(request: Request) {
     analyticsEvents,
   };
 
-  return Response.json(manifest, {
-    headers: {
-      'cache-control': 'no-store',
-      'content-disposition': `attachment; filename="site-export-${manifest.exportedAt.slice(0, 10)}.json"`,
-    },
-  });
+  const headers = new Headers({ 'cache-control': 'no-store' });
+  if (new URL(request.url).searchParams.get('download') === '1') {
+    headers.set('content-disposition', `attachment; filename="site-export-${manifest.exportedAt.slice(0, 10)}.json"`);
+  }
+  return Response.json(manifest, { headers });
 }
