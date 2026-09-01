@@ -50,6 +50,7 @@ interface StorageDriver {
   putSite(document: SiteDocument): Promise<void>;
   getAnalyticsEvents(): Promise<AnalyticsEvent[]>;
   appendAnalyticsEvent(event: AnalyticsEvent): Promise<void>;
+  listMedia(): Promise<MediaAsset[]>;
   putMedia(asset: MediaAsset, body: ReadableStream<Uint8Array>): Promise<void>;
   getMedia(id: string): Promise<MediaAsset | null>;
   readMedia(asset: MediaAsset, range?: ByteSlice): Promise<MediaRead | null>;
@@ -110,6 +111,17 @@ class FileStorage implements StorageDriver {
 
   appendAnalyticsEvent(event: AnalyticsEvent) {
     return this.writeJson(`analytics/events/${event.createdAt.slice(0, 10)}/${event.id}.json`, event);
+  }
+
+  async listMedia() {
+    try {
+      const entries = await readdir(this.resolve('media-meta'), { recursive: true });
+      const assets = await Promise.all(entries.filter((entry) => entry.endsWith('.json')).map((entry) => this.readJson<MediaAsset>(`media-meta/${entry}`)));
+      return assets.filter((asset): asset is MediaAsset => asset !== null).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      throw error;
+    }
   }
 
   async putMedia(asset: MediaAsset, body: ReadableStream<Uint8Array>) {
@@ -208,6 +220,18 @@ class S3Storage implements StorageDriver {
 
   appendAnalyticsEvent(event: AnalyticsEvent) {
     return this.writeJson(`analytics/events/${event.createdAt.slice(0, 10)}/${event.id}.json`, event);
+  }
+
+  async listMedia() {
+    const assets: MediaAsset[] = [];
+    let continuationToken: string | undefined;
+    do {
+      const page = await this.client.send(new ListObjectsV2Command({ Bucket: this.bucket, Prefix: this.key('media-meta/'), ContinuationToken: continuationToken }));
+      const batch = await Promise.all((page.Contents || []).filter((item) => item.Key?.endsWith('.json')).map((item) => this.readJson<MediaAsset>(item.Key!.slice(this.prefix.length + 1))));
+      assets.push(...batch.filter((asset): asset is MediaAsset => asset !== null));
+      continuationToken = page.IsTruncated ? page.NextContinuationToken : undefined;
+    } while (continuationToken);
+    return assets.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   }
 
   async putMedia(asset: MediaAsset, body: ReadableStream<Uint8Array>) {

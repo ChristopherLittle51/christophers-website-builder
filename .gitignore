@@ -4,6 +4,8 @@ node_modules/
 .env
 .env.local
 data/
+alisa-data/
+site-export*.json
 coverage/
 npm-debug.log*
 .DS_Store

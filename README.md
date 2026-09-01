@@ -50,6 +50,8 @@ docker compose up --build -d
 
 Compose mounts a named volume at `/app/data`. Back up that volume to retain the page document and uploaded media. The image uses Next.js standalone output and runs as an unprivileged user.
 
+To migrate a hosted Sites instance, use the authenticated export manifest and resumable media importer documented in [Sites to local Docker migration](docs/SITES_LOCAL_MIGRATION.md). This preserves drafts and uploaded-but-unused media as well as the published page.
+
 To run the image without Compose:
 
 ```bash
