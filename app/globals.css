@@ -419,6 +419,29 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
 .builder-social-links a { align-items: baseline; display: grid; gap: 12px; grid-template-columns: minmax(70px,.5fr) minmax(0,1fr) auto; padding: 14px 0; }
 .builder-social-links a > span:first-child { font-size: 10px; letter-spacing: .09em; opacity: .6; text-transform: uppercase; }
 .builder-social-links strong { font-size: clamp(18px,4vw,28px); overflow-wrap: anywhere; }
+.builder-social-icons { --social-icon-cutout: var(--block-bg); --social-icon-size: 44px; --social-icon-glyph: 20px; background: var(--block-bg); color: var(--block-ink); container-type: inline-size; min-width: 0; padding: 32px 18px; }
+.builder-social-icons > .builder-kicker { margin-bottom: 16px; }
+.builder-social-icons ul { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.builder-social-icons li { min-width: 0; }
+.builder-social-icons a { align-items: center; border: 1px solid transparent; border-radius: 999px; color: inherit; display: inline-flex; gap: 9px; justify-content: center; min-height: var(--social-icon-size); min-width: var(--social-icon-size); padding: 0; transition: background-color .18s ease,color .18s ease,transform .18s ease; }
+.builder-social-icons a:hover { transform: translateY(-2px); }
+.builder-social-icons a:focus-visible { outline: 3px solid var(--site-accent,#d8ff00); outline-offset: 3px; }
+.builder-social-icons a > span { font-size: 12px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.builder-social-icons__icon { display: block; fill: currentColor; flex: 0 0 auto; height: var(--social-icon-glyph); width: var(--social-icon-glyph); }
+.builder-social-icons--small { --social-icon-size: 36px; --social-icon-glyph: 17px; }
+.builder-social-icons--large { --social-icon-size: 54px; --social-icon-glyph: 25px; }
+.builder-social-icons--labels a { padding-left: calc((var(--social-icon-size) - var(--social-icon-glyph)) / 2); padding-right: calc((var(--social-icon-size) - var(--social-icon-glyph)) / 2 + 2px); }
+.builder-social-icons--outline a { border-color: currentColor; }
+.builder-social-icons--filled a { --social-icon-cutout: var(--block-ink); background: var(--block-ink); color: var(--block-bg); }
+.builder-social-icons--simple a:hover,.builder-social-icons--outline a:hover { background: color-mix(in srgb,currentColor 10%,transparent); }
+.builder-social-icons--align-center { --social-list-align: center; }
+.builder-social-icons--align-right { --social-list-align: end; }
+.builder-social-icons--align-center ul { justify-content: center; }
+.builder-social-icons--align-right ul { justify-content: flex-end; }
+.builder-social-icons--column ul { align-items: var(--social-list-align,start); flex-direction: column; }
+@container (max-width: 420px) {
+  .builder-social-icons--auto ul { align-items: var(--social-list-align,start); flex-direction: column; }
+}
 .builder-code-snippet { background: var(--site-ink,#050505); color: var(--site-paper,#f7f7f3); margin: 0; padding: 22px 18px; }
 .builder-code-snippet figcaption { align-items: center; display: flex; font-family: var(--font-body); justify-content: space-between; margin: 0 0 18px; }
 .builder-code-snippet figcaption strong { font-family: inherit; font-size: 13px; }
@@ -839,7 +862,7 @@ footer { background: var(--acid); display: flex; font-size: 10px; justify-conten
   .builder-end-credits dl > div { grid-template-columns: 1fr 1fr; }
   .builder-end-credits--center dt { text-align: right; }
   .builder-end-credits--center dd { text-align: left; }
-  .builder-flex-row,.builder-flex-column,.builder-inset,.builder-aspect-frame,.builder-media-text,.builder-feature-list,.builder-logo-cloud,.builder-metric-list,.builder-checklist,.builder-social-links,.builder-accordion { padding-left: 4vw; padding-right: 4vw; }
+  .builder-flex-row,.builder-flex-column,.builder-inset,.builder-aspect-frame,.builder-media-text,.builder-feature-list,.builder-logo-cloud,.builder-metric-list,.builder-checklist,.builder-social-links,.builder-social-icons,.builder-accordion { padding-left: 4vw; padding-right: 4vw; }
   .builder-media-text { gap: 4vw; grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
   .builder-media-text--right > img { grid-column: 2; }
   .builder-media-text--right > div { grid-column: 1; grid-row: 1; }
