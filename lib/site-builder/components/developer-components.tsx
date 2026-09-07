@@ -10,14 +10,30 @@ export const developerComponents: Record<string, any> = {
   CodeSnippetBlock: {
         label: 'Code snippet',
         fields: { eyebrow: { type: 'text', label: 'Language label', contentEditable: true }, title: { type: 'text', label: 'Snippet title', contentEditable: true }, code: { type: 'textarea', label: 'Code', contentEditable: true }, filename: { type: 'text', label: 'Filename' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
-        defaultProps: { eyebrow: 'TypeScript', title: 'A small boundary with a clear job.', filename: 'lib/format.ts', code: "export function formatName(name: string) {\\n  return name.trim().replace(/\\\\s+/g, ' ');\\n}", theme: 'black' },
+        defaultProps: { eyebrow: 'TypeScript', title: 'A small boundary with a clear job.', filename: 'lib/format.ts', code: "export function formatName(name: string) {\n  return name.trim().replace(/\\s+/g, ' ');\n}", theme: 'black' },
         render: ({ eyebrow, title, code, filename, theme }) => <section className={'builder-dev-code builder-theme--' + theme}><header><span>{eyebrow}</span><strong>{filename}</strong></header><h2>{title}</h2><pre><code>{code}</code></pre></section>,
   },
   TerminalBlock: {
         label: 'Terminal session',
         fields: { title: { type: 'text', label: 'Terminal title' }, prompt: { type: 'text', label: 'Prompt' }, lines: { type: 'array', label: 'Terminal lines', min: 1, max: 16, arrayFields: { text: { type: 'text', label: 'Line' }, kind: { type: 'radio', label: 'Line type', options: [{ label: 'Command', value: 'command' }, { label: 'Output', value: 'output' }, { label: 'Success', value: 'success' }] } }, defaultItemProps: (index) => ({ text: index === 0 ? 'npm run build' : 'Build completed successfully.', kind: index === 0 ? 'command' : 'success' }), getItemSummary: (item, index) => item.text || 'Line ' + ((index || 0) + 1) } },
-        defaultProps: { title: 'Local development', prompt: 'sam@studio:~/project$', lines: [{ text: 'npm run build', kind: 'command' }, { text: '▲ Compiled in 1.8s', kind: 'output' }, { text: 'Build completed successfully.', kind: 'success' }] },
-        render: ({ title, prompt, lines }) => <section className="builder-dev-terminal"><header><span>{title}</span><i aria-hidden="true" /><i aria-hidden="true" /><i aria-hidden="true" /></header><div><p className="builder-dev-terminal__prompt">{prompt}</p>{(lines || []).map((line: { text: string; kind: string }, index: number) => <p className={'builder-dev-terminal__line builder-dev-terminal__line--' + (line.kind || 'output')} key={line.text + '-' + index}><span>{line.kind === 'command' ? '›' : line.kind === 'success' ? '✓' : ' '}</span>{line.text}</p>)}</div></section>,
+        defaultProps: { title: 'project — zsh', prompt: 'sam@studio project %', lines: [{ text: 'npm run build', kind: 'command' }, { text: '▲ Compiled in 1.8s', kind: 'output' }, { text: 'Build completed successfully.', kind: 'success' }] },
+        render: ({ title, prompt, lines }) => (
+          <section className="builder-dev-terminal" aria-label={title || 'Terminal session'}>
+            <header className="builder-dev-terminal__titlebar">
+              <div className="builder-dev-terminal__controls" aria-hidden="true"><i /><i /><i /></div>
+              <span className="builder-dev-terminal__title">{title}</span>
+            </header>
+            <div className="builder-dev-terminal__body">
+              {(lines || []).map((line: { text: string; kind: string }, index: number) => (
+                <p className={'builder-dev-terminal__line builder-dev-terminal__line--' + (line.kind || 'output')} key={index}>
+                  {line.kind === 'command' && prompt ? <span className="builder-dev-terminal__prompt">{prompt}{' '}</span> : null}
+                  {line.text}
+                </p>
+              ))}
+              <p className="builder-dev-terminal__line" aria-hidden="true"><span className="builder-dev-terminal__prompt">{prompt}{' '}</span><span className="builder-dev-terminal__cursor" /></p>
+            </div>
+          </section>
+        ),
   },
   TechStackBlock: {
         label: 'Tech stack',
@@ -34,7 +50,7 @@ export const developerComponents: Record<string, any> = {
   ApiEndpointBlock: {
         label: 'API endpoint',
         fields: { method: { type: 'radio', label: 'HTTP method', options: [{ label: 'GET', value: 'GET' }, { label: 'POST', value: 'POST' }, { label: 'PUT', value: 'PUT' }, { label: 'DELETE', value: 'DELETE' }] }, path: { type: 'text', label: 'Endpoint path' }, title: { type: 'text', label: 'Endpoint title', contentEditable: true }, description: { type: 'textarea', label: 'Description', contentEditable: true }, response: { type: 'textarea', label: 'Response example', contentEditable: true }, auth: { type: 'text', label: 'Authentication note' }, theme: { type: 'radio', label: 'Theme', options: themeOptions } },
-        defaultProps: { method: 'GET', path: '/v1/projects/:id', title: 'Read a project', description: 'Fetch the public project shape by its stable identifier.', response: '{\\n  \"id\": \"proj_7f2\",\\n  \"status\": \"active\"\\n}', auth: 'Public · rate limited', theme: 'paper' },
+        defaultProps: { method: 'GET', path: '/v1/projects/:id', title: 'Read a project', description: 'Fetch the public project shape by its stable identifier.', response: '{\n  \"id\": \"proj_7f2\",\n  \"status\": \"active\"\n}', auth: 'Public · rate limited', theme: 'paper' },
         render: ({ method, path, title, description, response, auth, theme }) => <section className={'builder-dev-endpoint builder-theme--' + theme}><header><span className={'builder-dev-endpoint__method builder-dev-endpoint__method--' + String(method).toLowerCase()}>{method}</span><code>{path}</code></header><h2>{title}</h2><p>{description}</p><div className="builder-dev-endpoint__response"><span>Response · 200 OK</span><pre>{response}</pre></div><small>{auth}</small></section>,
   },
   ArchitectureBlock: {
