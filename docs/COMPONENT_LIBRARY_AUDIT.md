@@ -1,8 +1,11 @@
 # Component library audit and organization
 
-This is the current organizational contract for all 72 registered Puck
-component keys. Each key appears in exactly one picker category. Categories
-describe an author's starting point, not whether a block may be nested.
+This is the organizational contract for the 73 established compatibility Puck
+component keys. The 20 Signal systems are cataloged separately in the
+[production component-library handoff](production-library/README.md), which
+records the complete 93-key registry and its current evidence. Each key here
+appears in exactly one picker category. Categories describe an author's
+starting point, not whether a block may be nested.
 
 ## Picker taxonomy
 

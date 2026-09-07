@@ -1,4 +1,5 @@
 import 'server-only';
+import type { SiteSettingsVersions } from './site-settings';
 
 import {
   GetObjectCommand,
@@ -22,6 +23,7 @@ export type SiteDocument = {
   draft: Data;
   pages?: SitePage[];
   homepageId?: string;
+  siteSettings?: SiteSettingsVersions;
   version: number;
   updatedAt: string | null;
   updatedBy: string;

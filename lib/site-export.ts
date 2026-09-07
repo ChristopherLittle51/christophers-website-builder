@@ -1,3 +1,4 @@
+import type { SiteSettingsVersions } from './site-settings';
 import type { AnalyticsEvent } from './analytics-types';
 import type { Data } from '@puckeditor/core';
 import type { SitePage } from './site-pages';
@@ -10,6 +11,7 @@ export type ExportedSiteDocument = {
   draft: Data;
   pages?: SitePage[];
   homepageId?: string;
+  siteSettings?: SiteSettingsVersions;
   version: number;
   updatedAt: string | null;
   updatedBy: string;

@@ -67,3 +67,19 @@
 }
 
 @media (min-width: 700px) { .template-picker__grid { grid-template-columns: repeat(3,1fr); } }
+
+.site-settings-dialog { width: min(840px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow: auto; padding: 24px; color: #171a20; background: #fff; border: 1px solid #9398a1; border-radius: 12px; font: 14px/1.5 system-ui; }
+.site-settings-dialog::backdrop { background: #0a101ac0; }
+.site-settings-dialog header, .site-settings-dialog footer { display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.site-settings-dialog h2 { margin: 0; font-size: 24px; }
+.site-settings-dialog fieldset { margin: 20px 0; padding: 16px; border: 1px solid #9fa4ad; display: grid; gap: 12px; min-width: 0; }
+.site-settings-dialog legend { font-weight: 700; }
+.site-settings-dialog label { display: grid; gap: 5px; }
+.site-settings-dialog label:has([type=checkbox]) { display: flex; align-items: center; gap: 8px; }
+.site-settings-dialog input:not([type=checkbox]), .site-settings-dialog textarea, .site-settings-dialog select { width: 100%; min-width: 0; padding: 10px; border: 1px solid #8b8e96; background: #fff; color: #14161b; border-radius: 4px; }
+.site-settings-dialog button { padding: 10px 14px; min-height: 44px; background: #eff2f7; border: 1px solid #858b96; color: #14161b; border-radius: 5px; cursor: pointer; }
+.site-settings-dialog button:disabled { opacity: .5; cursor: default; }
+.site-settings-dialog :focus-visible { outline: 3px solid #245dc1; outline-offset: 3px; }
+.site-settings-page { display: grid; gap: 10px; border-top: 1px solid #b8bdc6; padding-top: 16px; }
+.site-settings-row { display: flex; gap: 24px; }
+.site-settings-markdown { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 400px; overflow: auto; background: #f0f2f6; padding: 16px; }

@@ -12,7 +12,8 @@
     "build": "next build",
     "start": "next start",
     "import:site": "node scripts/import-site-export.mjs",
-    "test": "npm run test:embeds && npm run test:github && npm run test:media && npm run test:metadata && npm run test:puck-data && npm run test:site-pages && npm run test:analytics",
+    "test": "npm run test:catalog && npm run test:embeds && npm run test:github && npm run test:media && npm run test:metadata && npm run test:puck-data && npm run test:site-pages && npm run test:analytics && npm run test:site-navigation && npm run test:crawlers && npm run test:brief-handoff && npm run test:render",
+    "test:catalog": "node --experimental-strip-types --test lib/site-builder/catalog.test.ts",
     "test:embeds": "node --experimental-strip-types --test lib/embed-utils.test.ts",
     "test:github": "node --experimental-strip-types --test lib/github.test.ts",
     "test:media": "node --experimental-strip-types --test lib/media.test.ts",
@@ -20,7 +21,14 @@
     "test:puck-data": "node --experimental-strip-types --test lib/puck-data.test.ts",
     "test:site-pages": "node --experimental-strip-types --test lib/site-pages.test.ts",
     "test:analytics": "node --experimental-strip-types --test lib/analytics.test.ts",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "test:site-navigation": "node --experimental-strip-types --test lib/site-navigation.test.ts",
+    "test:crawlers": "node --experimental-strip-types --test lib/crawlers.test.ts && node --import tsx --test proxy.test.ts",
+    "test:brief-handoff": "node --experimental-strip-types --test lib/brief-handoff.test.ts",
+    "test:browser": "node scripts/verify-production-library.mjs",
+    "test:render": "node --import tsx --test lib/site-links-client.test.tsx",
+    "test:editor": "node scripts/verify-editor-library.mjs",
+    "test:site-features": "node scripts/verify-site-features.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.899.0",
@@ -45,15 +53,19 @@
     "@fontsource/source-code-pro": "^5.3.0",
     "@puckeditor/core": "^0.23.0",
     "next": "^16.3.3",
+    "parse5": "^8.0.1",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "axe-core": "^4.13.0",
     "eslint": "9.39.4",
     "eslint-config-next": "^16.3.3",
+    "tsx": "^4.23.13",
     "typescript": "5.9.3"
   },
   "type": "module"

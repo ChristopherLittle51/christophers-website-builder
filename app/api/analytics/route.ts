@@ -1,12 +1,13 @@
 import { sessionFromRequest } from '@/lib/auth';
 import { analyticsDays, getAnalyticsReport, recordPageView } from '@/lib/analytics';
+import { analyticsRequestOrigin } from '@/lib/analytics-origin';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   if (sessionFromRequest(request)) return new Response(null, { status: 204 });
-  const requestOrigin = new URL(request.url).origin;
+  const requestOrigin = analyticsRequestOrigin(request);
   const origin = request.headers.get('origin');
   if (origin && origin !== requestOrigin) return Response.json({ error: 'Cross-origin analytics events are not accepted.' }, { status: 403 });
   const contentLength = Number(request.headers.get('content-length') || 0);

@@ -36,11 +36,13 @@ export function toSitePages(document: LegacyDocument, fallback: Data) {
   return { pages: [{ id: 'home', slug: 'home', title: pageTitle(draft, 'Home'), draft, published }], homepageId: 'home' };
 }
 
+export const RESERVED_PAGE_SLUGS = new Set(['analytics', 'edit', 'login', 'api', 'images', 'content', 'migration-export', 'robots', 'sitemap', 'robots-txt', 'sitemap-xml', 'fixtures']);
+
 export function uniquePageSlug(requested: string, pages: Pick<SitePage, 'id' | 'slug'>[], exceptId?: string) {
   const base = slugifyPage(requested) || 'page';
   let candidate = base;
   let suffix = 2;
-  while (candidate === 'analytics' || pages.some((page) => page.id !== exceptId && page.slug === candidate)) candidate = `${base}-${suffix++}`;
+  while (RESERVED_PAGE_SLUGS.has(candidate) || pages.some((page) => page.id !== exceptId && page.slug === candidate)) candidate = `${base}-${suffix++}`;
   return candidate;
 }
 

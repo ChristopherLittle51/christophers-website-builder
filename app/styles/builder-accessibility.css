@@ -1,0 +1,46 @@
+/* Shared production behavior for every component family. Kept first in the
+   cascade so family-specific focus treatments can refine this baseline. */
+.site-canvas :where(a, button, summary, input, select, textarea):focus-visible {
+  outline: 3px solid currentColor;
+  box-shadow: 0 0 0 5px var(--block-bg, var(--site-paper, #fff));
+  outline-offset: 3px;
+}
+
+.site-canvas :where(a, button, summary) {
+  touch-action: manipulation;
+}
+
+.site-canvas :where(h1, h2, h3, p, a, span, strong, dt, dd, figcaption, code, pre) {
+  overflow-wrap: anywhere;
+}
+
+.site-canvas :where(img, video, iframe, svg) {
+  max-width: 100%;
+}
+
+.site-canvas :where(button, [type='range'], summary) {
+  min-height: 44px;
+}
+
+@media (forced-colors: active) {
+  .site-canvas :where(a, button, summary, input, select, textarea):focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+@media (max-width: 420px) {
+  .builder-header-bar nav,
+  .builder-button-group,
+  .builder-social-icons ul {
+    row-gap: 8px;
+  }
+
+  .builder-dev-endpoint header,
+  .builder-reel-showcase footer,
+  .builder-compare__control {
+    min-width: 0;
+  }
+}
+
+.site-canvas .builder-flex-grid figcaption > span { opacity: .7; }
+.published-site-shell :where(a, button):focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }

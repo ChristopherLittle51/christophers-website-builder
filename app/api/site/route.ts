@@ -1,8 +1,10 @@
+import { withSiteMutation } from '@/lib/site-mutation';
 import { sessionFromRequest } from '@/lib/auth';
 import { normalizeBuilderData } from '@/lib/puck-data';
 import { summaries, toSitePages, uniquePageSlug } from '@/lib/site-pages';
 import { jsonError, storage, type SiteDocument } from '@/lib/storage';
 import { starterData } from '@/lib/templates';
+import { buildPageCatalog } from '@/lib/site-catalog';
 import type { Data } from '@puckeditor/core';
 
 export const dynamic = 'force-dynamic';
@@ -26,18 +28,17 @@ export async function GET(request: Request) {
   const record = await storage().getSite();
   const site = toSitePages(record || { draft: starterData, published: starterData }, starterData);
   const page = site.pages.find((candidate) => candidate.id === pageId) || site.pages.find((candidate) => candidate.id === site.homepageId) || site.pages[0];
-  const source = mode === 'draft' ? page.draft : page.published || starterData;
+  if ((pageId && page.id !== pageId) || (mode !== 'draft' && !page.published)) return jsonError('Page not found.', 404);
+  const source = mode === 'draft' ? page.draft : page.published!;
   const normalized = normalizeBuilderData(source);
-  if (record && mode === 'draft' && normalized.changed) {
-    const pages = site.pages.map((candidate) => candidate.id === page.id ? { ...candidate, draft: normalized.data } : candidate);
-    const home = homeMirror(pages, site.homepageId);
-    await storage().putSite({ ...record, pages, homepageId: site.homepageId, draft: home.draft, published: home.published || starterData });
-  }
 
-  return Response.json({ data: normalized.data, page: { id: page.id, slug: page.slug, title: page.title }, pages: summaries(site.pages), homepageId: site.homepageId, version: record?.version || 0, updatedAt: record?.updatedAt || null, repairedIds: normalized.repairedIds });
+
+  return Response.json({ data: normalized.data, page: { id: page.id, slug: page.slug, title: mode === 'draft' ? page.title : String(normalized.data.root?.props?.title || 'Untitled page') }, pages: mode === 'draft' ? summaries(site.pages) : buildPageCatalog(site.pages, site.homepageId, 'published').map(({ id, slug, title }) => ({ id, slug, title })), catalog: buildPageCatalog(site.pages, site.homepageId, mode === 'draft' ? 'draft' : 'published'), homepageId: site.homepageId, version: record?.version || 0, updatedAt: record?.updatedAt || null, repairedIds: normalized.repairedIds }, { headers: { 'cache-control': 'no-store' } });
 }
 
-export async function PUT(request: Request) {
+export function PUT(request: Request) { return withSiteMutation(() => savePage(request)); }
+
+async function savePage(request: Request) {
   if (!sessionFromRequest(request)) return jsonError('Sign in to edit this site.', 401);
   const body = await request.json().catch(() => null) as { data?: unknown; pageId?: unknown; publish?: boolean } | null;
   if (!body || !isBuilderData(body.data)) return jsonError('The page content is not valid.', 400);
@@ -57,6 +58,7 @@ export async function PUT(request: Request) {
   } : candidate);
   const home = homeMirror(pages, site.homepageId);
   const record: SiteDocument = {
+    ...existing,
     published: home.published || starterData,
     draft: home.draft,
     pages,
@@ -66,10 +68,12 @@ export async function PUT(request: Request) {
     updatedBy: 'admin',
   };
   await storage().putSite(record);
-  return Response.json({ ok: true, published: !!body.publish, page: summaries(pages).find((candidate) => candidate.id === page.id), pages: summaries(pages), version: record.version, updatedAt: now, repairedIds: normalized.repairedIds });
+  return Response.json({ ok: true, published: !!body.publish, page: summaries(pages).find((candidate) => candidate.id === page.id), pages: summaries(pages), catalog: buildPageCatalog(pages, site.homepageId, 'draft'), version: record.version, updatedAt: now, repairedIds: normalized.repairedIds });
 }
 
-export async function POST(request: Request) {
+export function POST(request: Request) { return withSiteMutation(() => changePage(request)); }
+
+async function changePage(request: Request) {
   if (!sessionFromRequest(request)) return jsonError('Sign in to edit this site.', 401);
   const body = await request.json().catch(() => null) as { action?: unknown; pageId?: unknown; title?: unknown; slug?: unknown } | null;
   const existing = await storage().getSite();
@@ -84,7 +88,7 @@ export async function POST(request: Request) {
     const data = normalizeBuilderData({ ...starterData, root: { ...starterData.root, props: { ...starterData.root.props, title } } }).data;
     const pages = [...site.pages, { id, slug, title, draft: data, published: null }];
     const home = homeMirror(pages, site.homepageId);
-    await storage().putSite({ published: home.published || starterData, draft: home.draft, pages, homepageId: site.homepageId, version: existing?.version || 0, updatedAt: now, updatedBy: 'admin' });
+    await storage().putSite({ ...existing, published: home.published || starterData, draft: home.draft, pages, homepageId: site.homepageId, version: existing?.version || 0, updatedAt: now, updatedBy: 'admin' });
     return Response.json({ ok: true, page: summaries(pages).find((page) => page.id === id), pages: summaries(pages), homepageId: site.homepageId });
   }
 

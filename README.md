@@ -8,7 +8,7 @@ It is a normal Next.js application—not a hosted-platform project. Run it on a 
 
 - Mobile-first drag-and-drop editing powered by [Puck](https://puckeditor.com/).
 - Six starter templates, including a composable hero starter and a complete Director’s treatment for photography and moving image.
-- Seventy-two blocks organized into foundations, composition, hero options, portfolio storytelling, content patterns, media, integrations, developer, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
+- Ninety-three persisted blocks organized into foundations, composition, hero options, portfolio storytelling, content patterns, Signal systems, media, integrations, developer, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
 - Recursive nested containers with one to four columns and container-query reflow.
 - Expandable image grids with editorial, uniform, and filmstrip layouts.
 - Per-field and global font control using nine bundled open-source font families.
@@ -88,6 +88,7 @@ Deploy the Node server anywhere that supports a persistent process and environme
 | `AUTH_SECRET` | Production | At least 32 characters; signs editor sessions. |
 | `ADMIN_PASSWORD` | Production | Password used at `/login`. Store it only in the host's secret manager. |
 | `SITE_URL` | Recommended | Public origin used by metadata, for example `https://portfolio.example.com`. |
+| `RENDER_ORIGIN` | No | Optional same-origin renderer base for negotiated crawler Markdown; it must be an absolute `http` or `https` origin with no path, query, fragment, or credentials. If absent, the crawler uses a valid `SITE_URL`; if neither is valid, public requests remain HTML. |
 | `COOKIE_SECURE` | No | `auto` (default) supports LAN HTTP and marks sessions Secure for HTTPS requests, including TLS proxies that send `X-Forwarded-Proto`. Use `false` only to force non-Secure cookies everywhere. |
 | `STORAGE_DRIVER` | No | `filesystem` (default) or `s3`. |
 | `DATA_DIR` | Filesystem only | Persistent directory; defaults to `./data`. |
@@ -118,8 +119,9 @@ The main registry is `lib/site-builder.tsx`.
 - Hero options: a new slot-based composable hero with split, overlay, and text-only treatments, plus editorial and technical presets. See [hero authoring](docs/HERO_COMPONENTS.md).
 - Portfolio & storytelling: split feature, text section, grids, project cards, gallery, before/after comparison, video, sticky story, timeline, pull quote, marquee, links, facts, credits, and contact.
 - Content patterns: cards, callouts, accordions, feature lists, logos, avatars, metrics, checklists, code snippets, and notices.
+- Signal systems: twenty focused systems for command palettes, project navigation, research, launch, status, comparison, and interactive briefs.
 - Navigation & integrations: editable header/link bar, footer/site map, breadcrumbs, social links, Calendly, public GitHub repository metadata, sandboxed custom HTML/CSS/JS, and generic embeds.
-- The exact category map and composition decisions live in [the component-library audit](docs/COMPONENT_LIBRARY_AUDIT.md).
+- The exact category map and composition decisions live in [the component-library audit](docs/COMPONENT_LIBRARY_AUDIT.md). The production ownership boundaries, 93-key checklist, and dated per-component evidence are in [the production component-library handoff](docs/production-library/README.md).
 
 Templates are ordinary Puck JSON in `lib/templates.ts`. A new template must use registered component names and globally unique IDs. New component types should be added to `nestedAllowlist` so they can be used inside containers.
 
@@ -130,7 +132,7 @@ npm test
 npm run build
 ```
 
-Focused tests cover Calendly URL constraints, upload policy and byte ranges, published metadata normalization, and recursive Puck identity repair. The GitHub Actions workflow runs the same test and build commands.
+Focused tests cover Calendly URL constraints, upload policy and byte ranges, published metadata normalization, recursive Puck identity repair, crawler extraction, and brief handoff URL safety. The crawler routes, robots groups, trusted renderer origin, no-store boundaries, and isolated API verifier are documented in [Crawler content and Markdown](docs/CRAWLER_CONTENT.md). The GitHub Actions workflow runs the same test and build commands.
 
 ### Paragraph line breaks
 

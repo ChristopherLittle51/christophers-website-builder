@@ -33,6 +33,7 @@ import '@fontsource/nunito/700.css';
 import '@fontsource/archivo/400.css';
 import '@fontsource/archivo/700.css';
 import './globals.css';
+import '@/lib/site-navigation.css';
 
 function siteUrl() {
   try { return new URL(process.env.SITE_URL || 'http://localhost:3000'); }

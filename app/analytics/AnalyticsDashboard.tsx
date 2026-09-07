@@ -1,7 +1,7 @@
 'use client';
 
 import type { AnalyticsReport } from '@/lib/analytics';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Range = 7 | 30 | 90;
 
@@ -41,23 +41,46 @@ export default function AnalyticsDashboard({ initialReport }: { initialReport: A
   const [range, setRange] = useState<Range>(30);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshVersion, setRefreshVersion] = useState(0);
 
-  const changeRange = async (nextRange: Range) => {
-    if (nextRange === range) return;
+  const changeRange = (nextRange: Range) => {
     setRange(nextRange);
-    setError(null);
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/analytics?days=${nextRange}`, { cache: 'no-store' });
-      if (!response.ok) throw new Error('Could not load analytics');
-      setReport(await response.json() as AnalyticsReport);
-    } catch {
-      setError('Could not refresh this window. Showing the previous report.');
-      setRange(report.days as Range);
-    } finally {
-      setLoading(false);
-    }
+    setRefreshVersion((version) => version + 1);
   };
+
+  useEffect(() => {
+    let controller: AbortController | undefined;
+    const refresh = async () => {
+      controller?.abort();
+      const current = new AbortController();
+      controller = current;
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`/api/analytics?days=${range}`, { cache: 'no-store', signal: current.signal });
+        if (!response.ok) throw new Error('Could not load analytics');
+        const nextReport = await response.json() as AnalyticsReport;
+        if (!current.signal.aborted) setReport(nextReport);
+      } catch {
+        if (!current.signal.aborted) setError('Could not refresh this window. Showing the previous report.');
+      } finally {
+        if (!current.signal.aborted) setLoading(false);
+      }
+    };
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') void refresh();
+    };
+    void refresh();
+    const interval = window.setInterval(refreshWhenVisible, 30_000);
+    window.addEventListener('focus', refreshWhenVisible);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    return () => {
+      controller?.abort();
+      window.clearInterval(interval);
+      window.removeEventListener('focus', refreshWhenVisible);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
+  }, [range, refreshVersion]);
 
   const topPages = report.pages.map((item) => ({ label: shortPath(item.path), value: item.views, note: `${number.format(item.visitors)} visitors` }));
   const topSources = report.sources.map((item) => ({ label: item.source, value: item.views }));
@@ -70,7 +93,7 @@ export default function AnalyticsDashboard({ initialReport }: { initialReport: A
         <nav className="analytics-header__nav" aria-label="Studio navigation"><a href="/">View site ↗</a><a href="/edit">Edit site</a><form action="/api/auth/logout" method="post"><button type="submit">Sign out</button></form></nav>
       </header>
 
-      <section className="analytics-toolbar" aria-label="Analytics controls"><div><span>Reporting window</span><strong>{loading ? 'Refreshing…' : `Last ${report.days} days`}</strong>{error ? <small className="analytics-toolbar__error" role="alert">{error}</small> : null}</div><div className="analytics-range" role="group" aria-label="Reporting window"><button type="button" className={range === 7 ? 'is-active' : ''} onClick={() => void changeRange(7)}>7D</button><button type="button" className={range === 30 ? 'is-active' : ''} onClick={() => void changeRange(30)}>30D</button><button type="button" className={range === 90 ? 'is-active' : ''} onClick={() => void changeRange(90)}>90D</button></div></section>
+      <section className="analytics-toolbar" aria-label="Analytics controls"><div><span>Reporting window</span><strong>{loading ? 'Refreshing…' : `Last ${report.days} days`}</strong>{error ? <small className="analytics-toolbar__error" role="alert">{error}</small> : null}</div><div className="analytics-range" role="group" aria-label="Reporting window"><button type="button" className={range === 7 ? 'is-active' : ''} onClick={() => changeRange(7)}>7D</button><button type="button" className={range === 30 ? 'is-active' : ''} onClick={() => changeRange(30)}>30D</button><button type="button" className={range === 90 ? 'is-active' : ''} onClick={() => changeRange(90)}>90D</button><button type="button" onClick={() => setRefreshVersion((version) => version + 1)} disabled={loading}>Refresh</button></div></section>
 
       <section className="analytics-stats" aria-label="Summary"><article><span>Page views</span><strong>{number.format(report.summary.views)}</strong><small>Total visits to your published pages</small></article><article><span>Tab sessions</span><strong>{number.format(report.summary.visitors)}</strong><small>Anonymous browser-tab visits, not people</small></article><article><span>Pages reached</span><strong>{number.format(report.summary.pages)}</strong><small>{report.summary.topPage ? `Top: ${shortPath(report.summary.topPage)}` : 'Waiting for the first visit'}</small></article><article><span>Top source</span><strong className="analytics-stat-text">{report.summary.topSource || '—'}</strong><small>Referrer host or direct</small></article></section>
 
