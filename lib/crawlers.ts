@@ -133,11 +133,13 @@ export function isAiCrawlerUserAgent(userAgent: string) {
   return /\b(?:gptbot|oai-searchbot|chatgpt-user|claudebot|claude-searchbot|anthropic-ai|perplexitybot|google-extended|bytespider|ccbot)\b/i.test(userAgent);
 }
 
-export function crawlerFormatFromRequest(request: Request, userAgent = request.headers.get('user-agent') || ''): CrawlFormat | null {
+export function crawlerFormatFromRequest(
+  request: Request
+): CrawlFormat | null {
   const explicit = request.headers.get('accept') || '';
+
   if (acceptsMarkdown(explicit)) return 'markdown';
-  if (/(?:^|,)\s*text\/markdown\s*;/i.test(explicit)) return null;
-  if (isAiCrawlerUserAgent(userAgent)) return 'markdown';
+
   return null;
 }
 

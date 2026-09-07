@@ -23,7 +23,6 @@ test('formats semantic content as markdown and detects crawler requests', () => 
   assert.match(markdown, /\[there\]\(https:\/\/example\.test\/about\)/);
   assert.equal(crawlerFormatFromRequest(new Request('https://example.test/', { headers: { accept: 'text/markdown' } })), 'markdown');
   assert.equal(crawlerFormatFromRequest(new Request('https://example.test/', { headers: { accept: 'text/markdown;q=0' } })), null);
-  assert.equal(crawlerFormatFromRequest(new Request('https://example.test/', { headers: { 'user-agent': 'GPTBot/1.0' } })), 'markdown');
   assert.equal(crawlerFormatFromRequest(new Request('https://example.test/', { headers: { accept: 'text/html' } })), null);
   assert.match(markdown, /- One\n- Two/);
   assert.match(markdown, /\| A \| B \|/);
