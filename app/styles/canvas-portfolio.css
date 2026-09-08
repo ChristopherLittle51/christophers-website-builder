@@ -72,12 +72,12 @@
 .builder-split__copy { align-content: end; border-top: 1px solid currentColor; display: grid; min-height: 380px; padding: 12px 0 0; }
 .builder-number { align-self: start; font-size: 13px; font-weight: 800; }
 .builder-split h2,.builder-text h2 { font-size: clamp(40px,12vw,86px); letter-spacing: -.065em; line-height: .9; margin: auto 0 20px; }
-.builder-split p,.builder-text > p:last-child { font-size: clamp(16px,4.8vw,24px); line-height: 1.3; margin: 0; max-width: 720px; }
+.builder-split p,.builder-text > p:last-child,.builder-text > .builder-markdown { font-size: clamp(16px,4.8vw,24px); line-height: 1.3; margin: 0; max-width: 720px; }
 .builder-text { padding: 76px 18px; }
 .builder-text--center { text-align: center; }
-.builder-text--center > p:last-child { margin-inline: auto; }
+.builder-text--center > p:last-child,.builder-text--center > .builder-markdown { margin-inline: auto; }
 .builder-text--right { text-align: right; }
-.builder-text--right > p:last-child { margin-left: auto; }
+.builder-text--right > p:last-child,.builder-text--right > .builder-markdown { margin-left: auto; }
 .builder-text-title--size-compact { font-size: clamp(32px,8vw,62px) !important; }
 .builder-text-title--size-oversized { font-size: clamp(52px,15vw,124px) !important; }
 .builder-align--center { text-align: center; }

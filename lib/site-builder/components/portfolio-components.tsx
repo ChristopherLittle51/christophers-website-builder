@@ -1,5 +1,6 @@
 'use client';
 
+import { MarkdownText } from '../../markdown-text';
 import type { CSSProperties } from 'react';
 import { buildCalendlyEmbedUrl } from '../../embed-utils';
 import { nestedAllowlist } from '../catalog';
@@ -17,7 +18,7 @@ export const portfolioComponents: Record<string, any> = {
         label: 'Text',
         fields: { eyebrow: { type: 'text', label: 'Small intro', contentEditable: true }, heading: { type: 'text', label: 'Heading', contentEditable: true }, body: { type: 'textarea', label: 'Body', contentEditable: true }, eyebrowFont: fontField('Intro font'), headingFont: fontField('Heading font'), bodyFont: fontField('Body font'), headingSize: { type: 'select', label: 'Heading size', options: sizeOptions }, headingTracking: { type: 'select', label: 'Heading spacing', options: trackingOptions }, align: { type: 'radio', label: 'Alignment', options: alignOptions } },
         defaultProps: { eyebrow: 'A note from the studio', heading: 'Stories should feel human.', body: 'Add a short paragraph here. Click the text to edit it directly, or use the controls in the sidebar.', eyebrowFont: 'inherit', headingFont: 'inherit', bodyFont: 'inherit', headingSize: 'standard', headingTracking: 'tight', align: 'left' },
-        render: ({ eyebrow, heading, body, eyebrowFont, headingFont, bodyFont, headingSize, headingTracking, align }) => <section className={`builder-text builder-text--${align}`}><p className="builder-kicker" style={fontStyle(eyebrowFont)}>{eyebrow}</p><h2 className={typeClass('builder-text-title', headingSize, headingTracking)} style={fontStyle(headingFont)}>{heading}</h2><p style={fontStyle(bodyFont)}>{body}</p></section>,
+        render: ({ eyebrow, heading, body, eyebrowFont, headingFont, bodyFont, headingSize, headingTracking, align }) => <section className={`builder-text builder-text--${align}`}><p className="builder-kicker" style={fontStyle(eyebrowFont)}>{eyebrow}</p><h2 className={typeClass('builder-text-title', headingSize, headingTracking)} style={fontStyle(headingFont)}>{heading}</h2><div className="builder-markdown" style={fontStyle(bodyFont)}><MarkdownText block>{body}</MarkdownText></div></section>,
   },
   ExpandableGrid: {
         label: 'Expandable image grid',

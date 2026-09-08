@@ -12,7 +12,10 @@ import '@puckeditor/core/puck.css';
 import { builderConfig } from '@/lib/site-builder';
 import { normalizeBuilderData } from '@/lib/puck-data';
 import { starterData, templates } from '@/lib/templates';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+const editorViewports = [{ width: 390, height: 'auto' as const, label: 'Phone' }, { width: 768, height: 'auto' as const, label: 'Tablet' }, { width: 1280, height: 'auto' as const, label: 'Desktop' }];
+const editorDnd = { behavior: 'auto' as const };
 
 type SaveState = 'loading' | 'saved' | 'saving' | 'published' | 'error';
 type PageSummary = { id: string; slug: string; title: string };
@@ -68,7 +71,7 @@ export default function EditorClient({ editorName }: { editorName: string }) {
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
   }, [loadPage]);
 
-  const save = async (nextData: Data, publish: boolean) => {
+  const save = useCallback(async (nextData: Data, publish: boolean) => {
     setSaveState('saving');
     try {
       const response = await fetch('/api/site', {
@@ -85,7 +88,20 @@ export default function EditorClient({ editorName }: { editorName: string }) {
       setSaveState('error');
       throw new Error('Could not save the website');
     }
-  };
+  }, [activePage?.id]);
+
+  const publish = useCallback(async (nextData: Data) => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    const normalized = normalizeBuilderData(nextData).data;
+    latestData.current = normalized;
+    await save(normalized, true);
+  }, [save]);
+  // Puck treats override functions as component types. Keep them stable across
+  // typing, catalog updates and autosave status changes.
+  const overrides = useMemo(() => ({
+    preview: EditorSharedPreview,
+    headerActions: () => <EditorPublishButton onPublish={publish} />,
+  }), [publish]);
 
   const handleChange = (nextData: Data) => {
     const normalized = normalizeBuilderData(nextData);
@@ -98,7 +114,7 @@ export default function EditorClient({ editorName }: { editorName: string }) {
     setCatalog(current => current.map(page => page.id === activePage?.id ? { ...page, sections: collectSections(normalized.data) } : page));
     setSaveState('saving');
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => void save(normalized.data, false), 900);
+    saveTimer.current = setTimeout(() => { saveTimer.current = null; void save(normalized.data, false).catch(() => {}); }, 900);
   };
 
   const applyTemplate = (template: (typeof templates)[number]) => {
@@ -194,19 +210,15 @@ export default function EditorClient({ editorName }: { editorName: string }) {
       <Puck
         key={editorKey}
         config={builderConfig}
-        overrides={{ preview: EditorSharedPreview, headerActions: () => <EditorPublishButton onPublish={async nextData => { if (saveTimer.current) clearTimeout(saveTimer.current); const normalized = normalizeBuilderData(nextData).data; latestData.current = normalized; await save(normalized, true); }} /> }}
+        overrides={overrides}
         data={data}
         onChange={handleChange}
-        onPublish={async (nextData) => { if (saveTimer.current) clearTimeout(saveTimer.current); const normalized = normalizeBuilderData(nextData).data; latestData.current = normalized; await save(normalized, true); }}
-        dnd={{ behavior: 'auto' }}
+        onPublish={publish}
+        dnd={editorDnd}
         dictionary={{ 'header-publish': 'Publish website' }}
         headerTitle="Open Canvas editor"
         headerPath="/edit"
-        viewports={[
-          { width: 390, height: 'auto', label: 'Phone' },
-          { width: 768, height: 'auto', label: 'Tablet' },
-          { width: 1280, height: 'auto', label: 'Desktop' },
-        ]}
+        viewports={editorViewports}
       />
     </div></SiteLinksProvider>
   );

@@ -30,7 +30,11 @@ for (const [componentType, component] of Object.entries(builderConfig.components
   component.fields = { name: sectionNameField, ...component.fields };
   component.render = withSectionAnchor(component.render);
   if (!['LayoutContainer', 'FlexRow', 'FlexColumn', 'InsetContainer'].includes(componentType)) {
-    component.fields = { ...component.fields, ...typographyFields('typography', 'Block typography override') };
+    const fallbackFields = typographyFields('typography', 'Text fallback');
+    for (const property of Object.keys(typographyFields())) {
+      if (component.fields?.[property]) delete fallbackFields[`typography${property[0].toUpperCase()}${property.slice(1)}`];
+    }
+    component.fields = { ...component.fields, ...fallbackFields };
     component.render = withTypographyOverride(component.render);
   }
   component.resolveData = ({ props }: { props: Record<string, unknown> }) => {

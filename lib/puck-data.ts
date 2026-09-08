@@ -51,6 +51,7 @@ export function normalizeBuilderData(input: Data): NormalizedBuilderData {
   const usedAnchorNames = new Set<string>();
   let repairedIds = 0;
   let repairedNames = 0;
+  let repairedTypography = false;
 
   const allocateId = (component: ComponentLike, path: string) => {
     const current = typeof component.props.id === 'string' ? component.props.id.trim() : '';
@@ -89,6 +90,18 @@ export function normalizeBuilderData(input: Data): NormalizedBuilderData {
   };
 
   const walkComponent = (component: ComponentLike, path: string) => {
+    // Older unprefixed typography controls accidentally wrote capitalized keys.
+    // Consolidate the two text primitives into their native controls on read/save.
+    if (component.type === 'HeadingBlock' || component.type === 'ParagraphBlock') {
+      for (const property of ['font', 'fontWeight', 'fontStyle', 'letterSpacing', 'wordSpacing', 'lineHeight', 'textDecoration', 'textTransform', 'fontKerning']) {
+        const capitalized = property[0].toUpperCase() + property.slice(1);
+        if (capitalized in component.props || `typography${capitalized}` in component.props) repairedTypography = true;
+        const legacy = component.props[capitalized] ?? component.props[`typography${capitalized}`];
+        if (component.props[property] == null && legacy != null) component.props[property] = legacy;
+        delete component.props[capitalized];
+        delete component.props[`typography${capitalized}`];
+      }
+    }
     allocateId(component, path);
     allocateAnchorName(component, path);
     walkSlotValues(component.props, `${path}.props`);
@@ -118,5 +131,5 @@ export function normalizeBuilderData(input: Data): NormalizedBuilderData {
     });
   }
 
-  return { data, changed: repairedIds > 0 || repairedNames > 0, repairedIds };
+  return { data, changed: repairedIds > 0 || repairedNames > 0 || repairedTypography, repairedIds };
 }

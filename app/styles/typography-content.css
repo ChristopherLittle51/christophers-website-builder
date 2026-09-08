@@ -4,7 +4,15 @@
 .builder-heading--oversized { font-size: clamp(52px,15vw,132px); line-height: .84; }
 .builder-heading--tracking-natural { letter-spacing: -.02em; }
 .builder-heading--tracking-wide { letter-spacing: .025em; }
-.builder-typography-overrides > *,.builder-typography-overrides h1,.builder-typography-overrides h2,.builder-typography-overrides h3,.builder-typography-overrides h4,.builder-typography-overrides h5,.builder-typography-overrides h6,.builder-typography-overrides p,.builder-typography-overrides span,.builder-typography-overrides strong,.builder-typography-overrides em,.builder-typography-overrides small,.builder-typography-overrides a,.builder-typography-overrides li,.builder-typography-overrides dt,.builder-typography-overrides dd,.builder-typography-overrides figcaption,.builder-typography-overrides cite,.builder-typography-overrides time,.builder-typography-overrides code,.builder-typography-overrides pre,.builder-typography-overrides summary,.builder-typography-overrides label { font-family: inherit !important; font-weight: inherit !important; font-style: inherit !important; letter-spacing: inherit !important; word-spacing: inherit !important; line-height: inherit !important; text-decoration: inherit !important; text-transform: inherit !important; font-kerning: inherit !important; }
+.builder-typography-fontFamily :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="font-family"]) { font-family: inherit; }
+.builder-typography-fontWeight :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="font-weight"]) { font-weight: inherit; }
+.builder-typography-fontStyle :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="font-style"]) { font-style: inherit; }
+.builder-typography-letterSpacing :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="letter-spacing"]) { letter-spacing: inherit; }
+.builder-typography-wordSpacing :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="word-spacing"]) { word-spacing: inherit; }
+.builder-typography-lineHeight :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="line-height"]) { line-height: inherit; }
+.builder-typography-textDecoration :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="text-decoration"]) { text-decoration: inherit; }
+.builder-typography-textTransform :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="text-transform"]) { text-transform: inherit; }
+.builder-typography-fontKerning :where(h1,h2,h3,h4,h5,h6,p,span,small,a,li,dt,dd,figcaption,cite,time,code,pre,summary,label):not([style*="font-kerning"]) { font-kerning: inherit; }
 .builder-paragraph { font-size: 18px; line-height: 1.45; margin: 0; padding: 18px; white-space: pre-line; }
 .builder-paragraph--small { font-size: 14px; }
 .builder-paragraph--lead { font-size: clamp(22px,5vw,36px); line-height: 1.2; }
@@ -130,3 +138,12 @@
 @keyframes builder-marquee { to { transform: translateX(-33.333%); } }
 
 /* Photography and cinema blocks share a restrained production-design language. */
+
+/* Markdown keeps authored newlines and the containing text block's typography. */
+.builder-markdown { white-space: normal; }
+.builder-markdown p,.builder-markdown [contenteditable] { white-space: pre-line; }
+.builder-markdown > :first-child { margin-top: 0; }
+.builder-markdown > :last-child { margin-bottom: 0; }
+.builder-markdown p { font: inherit; letter-spacing: inherit; line-height: inherit; }
+.builder-markdown a,.builder-heading a { text-decoration: underline; text-underline-offset: .15em; }
+.builder-markdown ul,.builder-markdown ol { padding-inline-start: 1.5em; white-space: normal; }

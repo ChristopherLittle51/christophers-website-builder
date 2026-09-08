@@ -39,11 +39,11 @@ export const TEXT_TRANSFORMS = [{ label: 'As typed', value: 'none' }, { label: '
 export const FONT_KERNING = [{ label: 'Browser default', value: 'auto' }, { label: 'Normal', value: 'normal' }, { label: 'None', value: 'none' }];
 
 type Field = Record<string, unknown>;
-const select = (label: string, options: readonly { label: string; value: string }[]) => ({ type: 'select' as const, label, options });
+const select = (label: string, options: readonly { label: string; value: string }[]) => ({ type: 'select' as const, label, options: [{ label: 'Use component styling', value: '' }, ...options] });
 
 /** Reusable Puck controls. Prefix allows several independently styled text roles in one block. */
 export const typographyFields = (prefix = '', label = 'Text') => {
-  const key = (name: string) => `${prefix}${name[0].toUpperCase()}${name.slice(1)}`;
+  const key = (name: string) => prefix ? `${prefix}${name[0].toUpperCase()}${name.slice(1)}` : name;
   return {
     [key('font')]: select(`${label} font`, [{ label: 'Use site default', value: 'inherit' }, ...FONT_OPTIONS]),
     [key('fontWeight')]: select(`${label} weight`, FONT_WEIGHTS),

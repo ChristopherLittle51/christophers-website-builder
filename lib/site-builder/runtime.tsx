@@ -5,6 +5,7 @@ import { cloneElement, isValidElement, useEffect, useRef, useState } from 'react
 import { buildCalendlyEmbedUrl } from '../embed-utils';
 import { formatGitHubCount, formatGitHubDate, parseGitHubRepository } from '../github';
 import { typographyStyle } from '../typography';
+import { MarkdownText } from '../markdown-text';
 import { fontStyle, imagePosition } from './shared';
 
 declare global {
@@ -83,8 +84,8 @@ export function withTypographyOverride(render: (props: any) => ReactNode): any {
     const rendered = render(props);
     if (!isValidElement(rendered)) return rendered;
     const typography = typographyStyle({ font: props.typographyFont, fontWeight: props.typographyFontWeight, fontStyle: props.typographyFontStyle, letterSpacing: props.typographyLetterSpacing, wordSpacing: props.typographyWordSpacing, lineHeight: props.typographyLineHeight, textDecoration: props.typographyTextDecoration, textTransform: props.typographyTextTransform, fontKerning: props.typographyFontKerning });
-    const hasOverride = Object.keys(typography).length > 0;
-    return cloneElement(rendered as ReactElement<any>, { className: `${(rendered.props as { className?: string }).className || ''}${hasOverride ? ' builder-typography-overrides' : ''}`.trim(), style: { ...((rendered.props as { style?: CSSProperties }).style || {}), ...typography } });
+    const classes = Object.keys(typography).map(key => `builder-typography-${key}`).join(' ');
+    return cloneElement(rendered as ReactElement<any>, { className: `${(rendered.props as { className?: string }).className || ''} ${classes}`.trim(), style: { ...typography, ...((rendered.props as { style?: CSSProperties }).style || {}) } });
   };
 }
 
@@ -101,9 +102,9 @@ export function NoticeView({ title, message, tone, dismissible, className, style
   return <aside id={id} className={`builder-notice builder-notice--${tone} ${className || ''}`.trim()} style={style} role="status"><div><strong>{title}</strong><p>{message}</p></div>{dismissible === 'hint' ? <button type="button" onClick={() => setDismissed(true)} aria-label="Dismiss notice">×</button> : null}</aside>;
 }
 
-export function HeadingPrimitive({ level, text, font, size, tracking, align, fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight, className, style, id }: { level: string; text: ReactNode; font: string; size: string; tracking: string; align: string; fontWeight?: string; fontStyle?: string; letterSpacing?: string; wordSpacing?: string; lineHeight?: string; className?: string; style?: CSSProperties; id?: string }) {
+export function HeadingPrimitive({ level, text, font, size, tracking, align, fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight, textDecoration, textTransform, fontKerning, className, style, id }: { level: string; text: ReactNode; font: string; size: string; tracking: string; align: string; fontWeight?: string; fontStyle?: string; letterSpacing?: string; wordSpacing?: string; lineHeight?: string; textDecoration?: string; textTransform?: string; fontKerning?: string; className?: string; style?: CSSProperties; id?: string }) {
   const Tag = (['h1', 'h2', 'h3'].includes(level) ? level : 'h2') as 'h1' | 'h2' | 'h3';
-  return <Tag id={id} className={`builder-heading builder-heading--${size} builder-heading--tracking-${tracking} builder-align--${align} ${className || ''}`.trim()} style={{ ...fontStyle(font), ...typographyStyle({ fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight }), ...style }}>{text}</Tag>;
+  return <Tag id={id} className={`builder-heading builder-heading--${size} builder-heading--tracking-${tracking} builder-align--${align} ${className || ''}`.trim()} style={{ ...style, ...fontStyle(font), ...typographyStyle({ fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight, textDecoration, textTransform, fontKerning }) }}><MarkdownText>{text}</MarkdownText></Tag>;
 }
 
 export function videoEmbedUrl(rawUrl: string) {

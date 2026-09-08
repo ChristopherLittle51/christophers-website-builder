@@ -1,5 +1,6 @@
 'use client';
 
+import { MarkdownText } from '../../markdown-text';
 import type { CSSProperties } from 'react';
 import { buildCalendlyEmbedUrl } from '../../embed-utils';
 import { typographyFields, typographyStyle } from '../../typography';
@@ -16,9 +17,9 @@ export const foundationsComponents: Record<string, any> = {
   },
   ParagraphBlock: {
         label: 'Paragraph',
-        fields: { text: { type: 'textarea', label: 'Text', contentEditable: true }, ...typographyFields('', 'Text'), size: { type: 'radio', label: 'Size', options: [{ label: 'Small', value: 'small' }, { label: 'Standard', value: 'standard' }, { label: 'Lead', value: 'lead' }] }, align: { type: 'radio', label: 'Alignment', options: alignOptions }, width: { type: 'radio', label: 'Line length', options: [{ label: 'Narrow', value: 'narrow' }, { label: 'Normal', value: 'normal' }, { label: 'Wide', value: 'wide' }] } },
+        fields: { text: { type: 'textarea', label: 'Text (Markdown supported)', contentEditable: true }, ...typographyFields('', 'Text'), size: { type: 'radio', label: 'Size', options: [{ label: 'Small', value: 'small' }, { label: 'Standard', value: 'standard' }, { label: 'Lead', value: 'lead' }] }, align: { type: 'radio', label: 'Alignment', options: alignOptions }, width: { type: 'radio', label: 'Line length', options: [{ label: 'Narrow', value: 'narrow' }, { label: 'Normal', value: 'normal' }, { label: 'Wide', value: 'wide' }] } },
         defaultProps: { text: 'Use a paragraph block for flexible body copy inside a custom layout.', font: 'inherit', size: 'standard', align: 'left', width: 'normal' },
-        render: ({ text, font, size, align, width, fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight }) => <p className={`builder-paragraph builder-paragraph--${size} builder-paragraph--${align} builder-paragraph--${width}`} style={{ ...fontStyle(font), ...typographyStyle({ fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight }) }}>{text}</p>,
+        render: ({ text, font, size, align, width, fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight, textDecoration, textTransform, fontKerning }) => <div className={`builder-paragraph builder-markdown builder-paragraph--${size} builder-paragraph--${align} builder-paragraph--${width}`} style={{ ...fontStyle(font), ...typographyStyle({ fontWeight, fontStyle: textStyle, letterSpacing, wordSpacing, lineHeight, textDecoration, textTransform, fontKerning }) }}><MarkdownText block>{text}</MarkdownText></div>,
   },
   EyebrowBlock: {
         label: 'Eyebrow / label',

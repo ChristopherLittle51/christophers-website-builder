@@ -1,6 +1,6 @@
 'use client';
 
-import { Children, cloneElement, createContext, isValidElement, useContext, useId, useState, type AnchorHTMLAttributes, type ReactNode } from 'react';
+import { cloneElement, createContext, isValidElement, useContext, useId, useState, type AnchorHTMLAttributes, type ReactNode } from 'react';
 import type { SiteSettings } from './site-settings';
 import type { CustomFieldRender } from '@puckeditor/core';
 import { resolveLink, safeHref, type LinkPage, type LinkValue } from './site-catalog';
@@ -73,16 +73,20 @@ function resolveValues(value: any, context: LinkContext): any {
 }
 
 function cleanAnchors(node: ReactNode): ReactNode {
-  return Children.map(node, child => {
-    if (!isValidElement<Record<string, any>>(child)) return child;
-    const children = child.props.children ? cleanAnchors(child.props.children) : child.props.children;
-    if (child.type === 'a') {
-      const href = safeHref(child.props.href);
-      if (!href) return <span className={child.props.className} style={child.props.style} id={child.props.id}>{children}</span>;
-      return cloneElement(child, { href, ...(child.props.target === '_blank' ? { rel: 'noopener noreferrer' } : {}) }, children);
-    }
-    return child.props.children ? cloneElement(child, {}, children) : child;
+  // Preserve scalar children and authored keys. Children.map converts strings
+  // to arrays and rewrites keys, including those owned by inline/slot renderers.
+  if (Array.isArray(node)) return node.map((child, index) => {
+    const cleaned = cleanAnchors(child);
+    return isValidElement(cleaned) && cleaned.key == null ? cloneElement(cleaned, { key: `unkeyed-${index}` }) : cleaned;
   });
+  if (!isValidElement<Record<string, any>>(node)) return node;
+  const children = node.props.children == null ? node.props.children : cleanAnchors(node.props.children);
+  if (node.type === 'a') {
+    const href = safeHref(node.props.href);
+    if (!href) return <span key={node.key} className={node.props.className} style={node.props.style} id={node.props.id}>{children}</span>;
+    return cloneElement(node, { href, ...(node.props.target === '_blank' ? { rel: 'noopener noreferrer' } : {}) }, children);
+  }
+  return node.props.children == null ? node : cloneElement(node, {}, children);
 }
 
 export function withResolvedLinks(render: (props: any) => ReactNode) {

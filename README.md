@@ -166,3 +166,5 @@ christopher's website builder intentionally publishes one site with one administ
 ## License
 
 MIT. Puck and bundled fonts retain their respective open-source licenses.
+
+See [Text editing and typography](docs/editor-text/README.md) for Markdown syntax, style precedence, legacy migration, and the isolated editor regression workflow.
