@@ -1,3 +1,5 @@
+import { privatePageMetadata } from '@/lib/seo';
+export const metadata = privatePageMetadata;
 export const dynamic = 'force-dynamic';
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; returnTo?: string }> }) {

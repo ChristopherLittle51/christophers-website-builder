@@ -1,5 +1,6 @@
-import { buildPageCatalog, pagePath } from '@/lib/site-catalog';
-import { sitemapPagePaths } from '@/lib/crawlers';
+import { pagePath } from '@/lib/site-catalog';
+import { publicOrigin, resolvePageSeo } from '@/lib/seo';
+import { getSiteSettings } from '@/lib/site-settings';
 import { storage } from '@/lib/storage';
 import { starterData } from '@/lib/templates';
 import { toSitePages } from '@/lib/site-pages';
@@ -14,8 +15,12 @@ function xml(value: string) {
 export async function GET(request: Request) {
   const record = await storage().getSite();
   const site = toSitePages(record || { draft: starterData, published: starterData }, starterData);
-  const origin = new URL(process.env.SITE_URL || request.url).origin;
-  const catalog = buildPageCatalog(site.pages, site.homepageId, 'published');
-  const urls = sitemapPagePaths(catalog).map((path) => `<url><loc>${xml(new URL(path, origin).toString())}</loc></url>`).join('');
+  const settings = getSiteSettings(record, 'published');
+  const origin = publicOrigin(request, process.env.SITE_URL, settings.seo.siteUrl);
+  const urls = site.pages.flatMap(page => {
+    if (!page.published) return [];
+    const seo = resolvePageSeo(page.published, pagePath(page, site.homepageId), origin, settings.seo, settings.crawler.search);
+    return seo.includeInSitemap ? [`<url><loc>${xml(seo.canonical)}</loc></url>`] : [];
+  }).join('');
   return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, { headers: { 'cache-control': 'no-store', 'content-type': 'application/xml; charset=utf-8' } });
 }

@@ -131,10 +131,9 @@ The internal request forwards only the negotiation marker, original public
 path, the original `Accept`, and `User-Agent`; it does not forward visitor cookies or
 authorization. The representation and fallback response vary on `Accept` and
 `User-Agent`, use `no-store`, and continue to resolve pages from the published
-catalog. The proxy bounds the internal request to nine seconds. Preserving the
-original `Accept` value also lets the content route distinguish an explicit
-Markdown request from automatic AI-crawler negotiation and enforce the
-`aiMarkdown` setting. `npm run test:crawlers` includes the success,
+catalog. The proxy bounds the internal request to nine seconds. AI crawler
+requests without an explicit Markdown `Accept` header pass through to the
+ordinary HTML page. `npm run test:crawlers` includes the success,
 extraction-failure, policy-preservation, and unreachable-route proxy contracts.
 
 ## Family ownership

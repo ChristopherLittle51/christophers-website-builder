@@ -35,7 +35,7 @@ test('emits configurable crawler policy directives', () => {
   assert.equal(groups.length, 3);
   assert.match(groups[0], /^User-agent: \*\nDisallow: \/$/);
   assert.match(groups[1], /^User-agent: GPTBot\nUser-agent: ClaudeBot\nUser-agent: Google-Extended\nUser-agent: CCBot\nUser-agent: Bytespider\nDisallow: \/$/);
-  assert.match(groups[2], /^User-agent: OAI-SearchBot\nUser-agent: Claude-SearchBot\nUser-agent: PerplexityBot\nAllow: \/\nDisallow: \/edit\nDisallow: \/login\nDisallow: \/api\/\nDisallow: \/analytics\nDisallow: \/migration-export\nDisallow: \/fixtures$/);
+  assert.match(groups[2], /^User-agent: OAI-SearchBot\nUser-agent: Claude-SearchBot\nUser-agent: PerplexityBot\nAllow: \/\nDisallow: \/edit\nDisallow: \/login\nDisallow: \/api\/\nDisallow: \/analytics\nDisallow: \/migration-export\nDisallow: \/fixtures\nAllow: \/api\/media\/$/);
   assert.doesNotMatch(body, /User-agent: ChatGPT-User/);
 });
 

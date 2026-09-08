@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { storage } from '@/lib/storage';
 import { starterData } from '@/lib/templates';
 import { getSiteMetadataSettings } from '@/lib/site-metadata';
+import { getSiteSettings } from '@/lib/site-settings';
+import { toSitePages } from '@/lib/site-pages';
+import { metadataOrigin } from '@/lib/seo-server';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/manrope';
 import '@fontsource-variable/space-grotesk';
@@ -35,20 +38,14 @@ import '@fontsource/archivo/700.css';
 import './globals.css';
 import '@/lib/site-navigation.css';
 
-function siteUrl() {
-  try { return new URL(process.env.SITE_URL || 'http://localhost:3000'); }
-  catch { return new URL('http://localhost:3000'); }
-}
-
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const record = await storage().getSite();
-  const data = record?.published || starterData;
+  const site = toSitePages(record || { draft: starterData, published: starterData }, starterData);
+  const data = site.pages.find(page => page.id === site.homepageId)?.published || { root: { props: {} }, content: [] };
+  const siteSettings = getSiteSettings(record, 'published');
   const settings = getSiteMetadataSettings(data);
-  const socialImage = settings.usesDefaultSocialImage
-    ? { url: settings.socialImage, width: 1672, height: 941, alt: settings.socialImageAlt }
-    : { url: settings.socialImage, alt: settings.socialImageAlt };
   const icons = settings.usesDefaultFavicon
     ? {
         icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }, { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' }],
@@ -58,23 +55,11 @@ export async function generateMetadata(): Promise<Metadata> {
     : { icon: [{ url: settings.favicon }], shortcut: settings.favicon, apple: [{ url: settings.favicon }] };
 
   return {
-    metadataBase: siteUrl(),
+    metadataBase: new URL(await metadataOrigin(siteSettings.seo)),
     title: settings.browserTitle,
-    description: settings.socialDescription,
-    applicationName: settings.socialTitle,
-    alternates: { canonical: '/' },
+    applicationName: siteSettings.seo.siteName || settings.browserTitle,
     manifest: '/site.webmanifest',
     icons,
-    openGraph: {
-      title: settings.socialTitle,
-      description: settings.socialDescription,
-      url: '/',
-      siteName: settings.socialTitle,
-      locale: 'en_US',
-      type: 'website',
-      images: [socialImage],
-    },
-    twitter: { card: 'summary_large_image', title: settings.socialTitle, description: settings.socialDescription, images: [{ url: settings.socialImage, alt: settings.socialImageAlt }] },
   };
 }
 

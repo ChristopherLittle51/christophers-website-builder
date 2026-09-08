@@ -168,3 +168,7 @@ christopher's website builder intentionally publishes one site with one administ
 MIT. Puck and bundled fonts retain their respective open-source licenses.
 
 See [Text editing and typography](docs/editor-text/README.md) for Markdown syntax, style precedence, legacy migration, and the isolated editor regression workflow.
+
+### Automatic SEO
+
+Published pages generate robots.txt, sitemap.xml, canonical URLs, search metadata, Open Graph and X/Twitter cards. Customize page overrides in page settings and shared defaults in Site settings. See [SEO configuration and verification](docs/SEO.md).

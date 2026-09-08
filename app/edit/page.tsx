@@ -1,3 +1,5 @@
+import { privatePageMetadata } from '@/lib/seo';
+export const metadata = privatePageMetadata;
 import { SESSION_COOKIE, verifySession } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';

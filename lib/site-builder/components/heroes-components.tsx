@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react';
 import { buildCalendlyEmbedUrl } from '../../embed-utils';
 import { nestedAllowlist } from '../catalog';
+import { StableSlot } from '../StableSlot';
 import { alignOptions, colorField, cropField, embedHeights, fontField, fontStyle, imageField, imagePosition, qolGapOptions, qolPaddingOptions, qolRadiusOptions, qolToneOptions, sizeOptions, themeOptions, trackingOptions, typeClass, videoField } from '../shared';
 import { BeforeAfterView, CalendlyWidget, GitHubRepositoryView, HeadingPrimitive, NoticeView, ScrollFilmStrip, SocialIcon, socialPlatformOptions, videoEmbedUrl } from '../runtime';
 
@@ -29,7 +30,7 @@ export const heroesComponents: Record<string, any> = {
         render: ({ layout, image, imageCrop, imageAlt, imageSide, overlay, horizontalAlign, verticalAlign, theme, content: Content }) => <section className={`builder-composable-hero builder-composable-hero--${layout || 'split'} builder-composable-hero--media-${imageSide || 'right'} builder-composable-hero--overlay-${overlay || 'strong'} builder-composable-hero--align-${horizontalAlign || 'left'} builder-composable-hero--vertical-${verticalAlign || 'end'} builder-theme--${theme || 'paper'}`}>
           {layout !== 'text' && image ? <img className="builder-composable-hero__media" src={image} alt={imageAlt || ''} style={imagePosition(imageCrop)} /> : null}
           {layout === 'overlay' ? <span className="builder-composable-hero__wash" aria-hidden="true" /> : null}
-          <div className="builder-composable-hero__content">{Content ? <Content className="builder-composable-hero__dropzone" collisionAxis="y" minEmptyHeight={260} /> : null}</div>
+          <div className="builder-composable-hero__content">{Content ? <StableSlot render={Content} className="builder-composable-hero__dropzone" collisionAxis="y" minEmptyHeight={260} /> : null}</div>
         </section>,
   },
   EditorialHero: {

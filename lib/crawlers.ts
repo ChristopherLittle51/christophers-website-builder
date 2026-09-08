@@ -156,7 +156,7 @@ export function hasExplicitMarkdownAccept(request: Request) { return acceptsMark
 
 export function crawlerRobotsDirectives(settings: { search: 'allow' | 'disallow'; aiTraining: 'allow' | 'disallow'; aiSearch: 'allow' | 'disallow'; aiMarkdown: boolean }) {
   const privatePaths = ['/edit', '/login', '/api/', '/analytics', '/migration-export', '/fixtures'];
-  const group = (agents: string[], allowed: boolean) => [...agents.map(agent => `User-agent: ${agent}`), allowed ? 'Allow: /' : 'Disallow: /', ...(allowed ? privatePaths.map(path => `Disallow: ${path}`) : []), ''];
+  const group = (agents: string[], allowed: boolean) => [...agents.map(agent => `User-agent: ${agent}`), allowed ? 'Allow: /' : 'Disallow: /', ...(allowed ? [...privatePaths.map(path => `Disallow: ${path}`), 'Allow: /api/media/'] : []), ''];
   const lines = [
     ...group(['*'], settings.search === 'allow'),
     ...group(['GPTBot', 'ClaudeBot', 'Google-Extended', 'CCBot', 'Bytespider'], settings.aiTraining === 'allow'),

@@ -30,3 +30,33 @@ The reported one-character remount was not reproduced in the original local Para
 Verified locally: 7 Markdown/link rendering tests (including all 93 default component renders), 5 persistence-normalization tests, TypeScript, and the browser regression passed. During the drag regression, the preview remained at scrollY 2878 before and after reordering; continuous `XYZ123` input survived autosave with the same editable node. No deployment was performed.
 
 References: [Puck override API](https://puckeditor.com/docs/api-reference/overrides), [Puck inline text fields](https://puckeditor.com/docs/api-reference/fields/text), and [react-markdown](https://github.com/remarkjs/react-markdown). Context7 was unavailable; installed Puck source and official documentation were inspected instead.
+
+## Nested slot remount fix — 2026-09-08
+
+### Reproduction and cause
+
+The continued report was reproduced in WebKit using an in-memory copy of the local draft. All five nested editable fields in MediaText and HeroLayout lost their DOM identity after one character. The old editable became disconnected, focus moved to the iframe body, and a lower HeroLayout field reset scrollY from 3216 to 0. Top-level paragraphs passed, which explains why the original regression missed this defect.
+
+Puck 0.23's `getSlotTransform` creates a new slot callback when nested content is transformed. Rendering that callback as `<Content />` makes it a new React component type and unmounts the drop zone. This is independent of the editor-level key and the preview override identities addressed earlier.
+
+`lib/site-builder/StableSlot.tsx` provides a stable component boundary and invokes the current Puck-generated slot render callback inside it. The callback is a hook-free factory in the installed Puck version; it returns the underlying drop-zone/render component. The same drop-zone type stays mounted while its props update. Do not replace this with `<Render />`, memoize an old callback, or restore scroll after a remount. Recheck this assumption when upgrading Puck or adding custom slot field transforms.
+
+Every slot in LayoutContainer, FlexRow, FlexColumn, InsetContainer, AspectRatio, MediaText, and HeroLayout uses this boundary. Existing slot names, component IDs, anchors, styles, nesting permissions, and resolveData behavior are retained. No persistence migration is needed.
+
+### Verification commands
+
+Run a development fixture server with `COMPONENT_FIXTURES=1 NEXT_BUILD_DIR=.next-editor-qa npm run dev -- --webpack --port 3010`. Browser test binaries can be installed with `npx playwright install chromium firefox webkit`.
+
+- `QA_BROWSER=webkit QA_NESTED=1 QA_SHARED_NAVIGATION=1 node scripts/verify-editor-text.mjs`
+- `QA_BROWSER=chromium QA_NESTED=1 QA_SHARED_NAVIGATION=1 node scripts/verify-editor-text.mjs`
+- `QA_BROWSER=webkit QA_COMPONENTS=LayoutContainer,FlexRow,FlexColumn,InsetContainer,AspectRatio,MediaText,HeroLayout node scripts/verify-inline-fields.mjs`
+- Optional local-draft reproduction: `QA_BROWSER=webkit QA_NESTED_ONLY=1 QA_DOCUMENT=data/documents/home.json node scripts/verify-inline-fields.mjs`
+- `npm run test:render` and `npx tsc --noEmit`
+
+`QA_ORIGIN` overrides localhost:3010. `QA_NESTED=1` places the 60 paragraph blocks inside a FlexColumn. The regression checks focus and element identity after each character without refocusing, saved text, typography, actual pointer drag activation, saved nested order, and scroll displacement below five pixels. Dragging starts from the block edge with time for the drag sensor to activate. Saves are intercepted; no real draft or published data is written.
+
+WebKit and Chromium passed nested typing/autosave/reordering at scrollY 3616. The final WebKit test also asserts the drag's exact scroll preservation. WebKit passed 13 visible inline fields across the layout gallery; one empty image caption in AspectRatio was invisible and counted separately. All five nested fields in the copied local draft passed. TypeScript and all three render tests passed, including the default rendering/anchor check for every registered component.
+
+An exploratory sweep of all local-draft fields also encountered a separate LensHeroBlock kicker click selecting its headline; both elements stayed mounted and there was no scroll reset. It is outside the nested remount fix and is not counted as a passing all-document check. Use `QA_NESTED_ONLY=1` to reproduce the scoped five-field result.
+
+Firefox's downloaded test browser failed before navigation with “Could not find profile folder,” including with a profile under /private/tmp. Firefox runtime verification remains outstanding; Playwright WebKit is engine-level verification, not a claim of testing the user's installed Safari. No deployment was performed.

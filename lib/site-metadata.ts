@@ -7,13 +7,13 @@ function text(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function safeAssetUrl(value: unknown) {
+export function safeAssetUrl(value: unknown) {
   const candidate = text(value);
-  if (!candidate) return '';
+  if (!candidate || /[\\\u0000-\u0020\u007f]/.test(candidate)) return '';
   if (candidate.startsWith('/') && !candidate.startsWith('//') && !candidate.includes('\n') && !candidate.includes('\r')) return candidate;
   try {
     const url = new URL(candidate);
-    return url.protocol === 'https:' ? url.toString() : '';
+    return url.protocol === 'https:' && !url.username && !url.password ? url.toString() : '';
   } catch {
     return '';
   }

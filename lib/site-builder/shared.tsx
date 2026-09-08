@@ -7,7 +7,7 @@ import { FONT_FAMILIES, FONT_OPTIONS } from '../typography';
 
 type MediaFieldProps = { label: string; value: string; onChange: (value: string) => void; readOnly?: boolean; kind: 'image' | 'video' };
 
-function MediaUpload({ label, value, onChange, readOnly, kind }: MediaFieldProps) {
+export function MediaUpload({ label, value, onChange, readOnly, kind }: MediaFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const isVideo = kind === 'video';

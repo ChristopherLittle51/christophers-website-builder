@@ -13,10 +13,11 @@ draft data and editor-only markup never enter the public crawler path.
   explicit endpoint, so it returns a clear `404` when Markdown is disabled or
   the page is not published. A render failure returns `502`.
 - `/` and `/<slug>` remain HTML for normal browsers. `proxy.ts` rewrites a
-  request to the corresponding `/content/*.md` route only for
-  `Accept: text/markdown` or a recognized AI crawler user agent. Automatic AI
-  Markdown additionally requires `crawler.aiMarkdown`. If the rewrite cannot
-  be used, the original HTML request continues with `Vary: Accept, User-Agent`.
+  request to the corresponding `/content/*.md` route only for an explicit
+  `Accept: text/markdown` request. AI crawler user agents without that header
+  remain on the original HTML response so crawlers that expect HTML are not
+  given a different representation. If the rewrite cannot be used, the
+  original HTML request continues with `Vary: Accept, User-Agent`.
 - `/api/crawler-preview?page=<page-id>` is an authenticated editor preview of
   the published representation. It does not preview draft content.
 
@@ -76,9 +77,10 @@ another:
 When a group is allowed, private application paths (`/edit`, `/login`,
 `/api/`, `/analytics`, `/migration-export`, and `/fixtures`) remain disallowed
 within that group. When a group is disallowed, the group receives
-`Disallow: /`. `aiMarkdown` controls automatic Markdown negotiation for the
-recognized AI user agents; it does not replace robots policy, and an explicit
-`Accept: text/markdown` request still follows the `markdown` setting.
+`Disallow: /`. The stored `aiMarkdown` setting does not override content
+negotiation: an AI crawler must explicitly request `Accept: text/markdown`,
+which still follows the `markdown` setting. Robots policy remains independent
+of representation.
 
 `/sitemap.xml` contains only pages with a published document whose root does
 not set `noIndex`. Page IDs are used internally for stable resolution; the

@@ -85,7 +85,8 @@ async function changePage(request: Request) {
     const title = typeof body?.title === 'string' && body.title.trim() ? body.title.trim().slice(0, 120) : 'Untitled page';
     const id = crypto.randomUUID();
     const slug = uniquePageSlug(typeof body?.slug === 'string' ? body.slug : title, site.pages);
-    const data = normalizeBuilderData({ ...starterData, root: { ...starterData.root, props: { ...starterData.root.props, title } } }).data;
+    const props = { ...starterData.root.props, title, socialTitle: '', socialDescription: '', socialImage: '', socialImageAlt: '' };
+    const data = normalizeBuilderData({ ...starterData, root: { ...starterData.root, props } }).data;
     const pages = [...site.pages, { id, slug, title, draft: data, published: null }];
     const home = homeMirror(pages, site.homepageId);
     await storage().putSite({ ...existing, published: home.published || starterData, draft: home.draft, pages, homepageId: site.homepageId, version: existing?.version || 0, updatedAt: now, updatedBy: 'admin' });
