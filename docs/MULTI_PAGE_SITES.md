@@ -7,11 +7,16 @@ time it is saved.
 
 ## Editor workflow
 
-The page rail above the editor lets an administrator switch pages, create a
-page, set its title and public slug, or delete a non-home page. Each page has
-its own Puck draft and published document. New pages begin as drafts, so their
-public route returns 404 until they are published. Autosave affects only the
-active page; publishing sends only that page live.
+The page rail above the editor lets an administrator switch pages, create or
+duplicate a page, export/import a page as JSON, set its title and public slug,
+or delete a non-home page. Each page has its own Puck draft and published
+document. New, duplicated, and imported pages begin as drafts, so their public
+route returns 404 until they are published. Autosave affects only the active
+page; publishing sends only that page live.
+
+Page exports contain the page title, slug, and Puck draft data. They do not
+carry the page ID or published state. Media bytes are not bundled, so imported
+pages retain their existing media references.
 
 Page and template actions use in-editor modal forms rather than browser-native
 `prompt()` or `confirm()` calls. Puck disables those APIs inside its editor

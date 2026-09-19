@@ -11,6 +11,7 @@ import { Puck, type Data } from '@puckeditor/core';
 import '@puckeditor/core/puck.css';
 import { builderConfig } from '@/lib/site-builder';
 import { normalizeBuilderData } from '@/lib/puck-data';
+import { makePageExport, parsePageExport } from '@/lib/page-transfer';
 import { starterData, templates } from '@/lib/templates';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -40,7 +41,9 @@ export default function EditorClient({ editorName }: { editorName: string }) {
   const [pageTitleInput, setPageTitleInput] = useState('');
   const [pageSlugInput, setPageSlugInput] = useState('');
   const [templateToApply, setTemplateToApply] = useState<(typeof templates)[number] | null>(null);
+  const [pageActionError, setPageActionError] = useState('');
   const latestData = useRef<Data>(starterData);
+  const importInput = useRef<HTMLInputElement | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadPage = useCallback(async (pageId?: string, replaceEditor = false) => {
@@ -58,6 +61,7 @@ export default function EditorClient({ editorName }: { editorName: string }) {
       setCatalog(result.catalog);
       setHomepageId(result.homepageId);
       setActivePage(result.page);
+      setPageActionError('');
       if (replaceEditor) setEditorKey((key) => key + 1);
       setSaveState('saved');
     } catch {
@@ -146,6 +150,69 @@ export default function EditorClient({ editorName }: { editorName: string }) {
     await switchPage(result.page.id);
   };
 
+  const duplicatePage = async () => {
+    if (!activePage) return;
+    setPageActionError('');
+    setSaveState('saving');
+    await flushPendingSave();
+    const response = await fetch('/api/site', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'duplicate', pageId: activePage.id }),
+    });
+    const result = await response.json() as { page?: PageSummary; error?: string };
+    if (!response.ok || !result.page) {
+      setSaveState('error');
+      setPageActionError(result.error || 'Could not duplicate the page.');
+      return;
+    }
+    await loadPage(result.page.id, true);
+  };
+
+  const exportPage = () => {
+    if (!activePage) return;
+    setPageActionError('');
+    const page = makePageExport(activePage.title, activePage.slug, normalizeBuilderData(latestData.current).data);
+    const blob = new Blob([JSON.stringify(page, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${activePage.slug || 'page'}.open-canvas-page.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const importPage = async (file: File) => {
+    setPageActionError('');
+    setSaveState('saving');
+    await flushPendingSave();
+    let page;
+    try {
+      page = parsePageExport(JSON.parse(await file.text()));
+    } catch {
+      page = null;
+    }
+    if (!page) {
+      setSaveState('saved');
+      setPageActionError('That file is not a supported Open Canvas page export.');
+      return;
+    }
+    const response = await fetch('/api/site', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'import', page }),
+    });
+    const result = await response.json() as { page?: PageSummary; error?: string };
+    if (!response.ok || !result.page) {
+      setSaveState('error');
+      setPageActionError(result.error || 'Could not import the page.');
+      return;
+    }
+    await loadPage(result.page.id, true);
+  };
+
   const renamePage = async (title: string, slug: string) => {
     if (!activePage) return;
     await flushPendingSave();
@@ -195,7 +262,7 @@ export default function EditorClient({ editorName }: { editorName: string }) {
           <span className={`save-state save-state--${saveState}`}>{saveState === 'saving' ? 'Saving…' : saveState === 'published' ? 'Published!' : saveState === 'error' ? 'Save failed' : 'All changes saved'}</span>
         </div>
       </div>
-      <nav className="editor-pages" aria-label="Site pages"><div className="editor-pages__list">{pages.map((page) => <button type="button" key={page.id} className={page.id === activePage?.id ? 'is-active' : ''} onClick={() => void switchPage(page.id)}>{page.id === homepageId ? 'Home' : page.title}</button>)}</div><div className="editor-pages__actions"><button type="button" onClick={() => openPageDialog('create')}>New page</button><button type="button" onClick={() => openPageDialog('rename')} disabled={!activePage}>Settings</button><button type="button" onClick={() => openPageDialog('delete')} disabled={!activePage || activePage.id === homepageId}>Delete</button></div></nav>
+      <nav className="editor-pages" aria-label="Site pages"><div className="editor-pages__list">{pages.map((page) => <button type="button" key={page.id} className={page.id === activePage?.id ? 'is-active' : ''} onClick={() => void switchPage(page.id)}>{page.id === homepageId ? 'Home' : page.title}</button>)}</div><div className="editor-pages__actions"><button type="button" onClick={() => openPageDialog('create')}>New page</button><button type="button" onClick={() => void duplicatePage()} disabled={!activePage}>Duplicate</button><button type="button" onClick={exportPage} disabled={!activePage}>Export</button><button type="button" onClick={() => importInput.current?.click()}>Import</button><input ref={importInput} className="editor-page-import" type="file" accept=".json,application/json" aria-label="Import page JSON" onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ''; if (file) void importPage(file); }} /><button type="button" onClick={() => openPageDialog('rename')} disabled={!activePage}>Settings</button><button type="button" className="is-delete" onClick={() => openPageDialog('delete')} disabled={!activePage || activePage.id === homepageId}>Delete</button>{pageActionError ? <span className="editor-page-error" role="alert">{pageActionError}</span> : null}</div></nav>
       {showTemplates ? <aside className="template-picker" aria-label="Site templates"><div><span>Start from a template</span><button type="button" onClick={() => setShowTemplates(false)} aria-label="Close templates">×</button></div><div className="template-picker__grid">{templates.map((template) => <button type="button" key={template.id} onClick={() => setTemplateToApply(template)}><strong>{template.name}</strong><span>{template.description}</span><em>Use template →</em></button>)}</div></aside> : null}
       {pageDialog ? <div className="editor-dialog-backdrop" role="presentation"><form className="editor-dialog" onSubmit={(event) => void submitPageDialog(event)}><div><span>{pageDialog === 'create' ? 'New page' : pageDialog === 'rename' ? 'Page settings' : 'Delete page'}</span><button type="button" onClick={() => setPageDialog(null)} aria-label="Close dialog">×</button></div>{pageDialog === 'delete' ? <p>Delete “{activePage?.title}”? This cannot be undone.</p> : <><label>Page name<input autoFocus value={pageTitleInput} onChange={(event) => setPageTitleInput(event.target.value)} required /></label>{pageDialog === 'rename' ? <label>Public URL slug<input value={pageSlugInput} onChange={(event) => setPageSlugInput(event.target.value)} placeholder="about" /></label> : null}</>}<footer><button type="button" onClick={() => setPageDialog(null)}>Cancel</button><button type="submit" className={pageDialog === 'delete' ? 'is-danger' : ''}>{pageDialog === 'delete' ? 'Delete page' : 'Save page'}</button></footer></form></div> : null}
       {templateToApply ? <div className="editor-dialog-backdrop" role="presentation"><div className="editor-dialog" role="dialog" aria-modal="true" aria-label="Confirm template"><div><span>Replace draft?</span><button type="button" onClick={() => setTemplateToApply(null)} aria-label="Close dialog">×</button></div><p>Use “{templateToApply.name}” for this page? Its published version will stay unchanged until you publish.</p><footer><button type="button" onClick={() => setTemplateToApply(null)}>Cancel</button><button type="button" onClick={() => { applyTemplate(templateToApply); setTemplateToApply(null); }}>Use template</button></footer></div></div> : null}

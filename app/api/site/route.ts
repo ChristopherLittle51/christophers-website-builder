@@ -1,20 +1,14 @@
 import { withSiteMutation } from '@/lib/site-mutation';
 import { sessionFromRequest } from '@/lib/auth';
 import { normalizeBuilderData } from '@/lib/puck-data';
-import { summaries, toSitePages, uniquePageSlug } from '@/lib/site-pages';
+import { pageTitle, summaries, toSitePages, uniquePageSlug } from '@/lib/site-pages';
+import { isBuilderData, parsePageExport } from '@/lib/page-transfer';
 import { jsonError, storage, type SiteDocument } from '@/lib/storage';
 import { starterData } from '@/lib/templates';
 import { buildPageCatalog } from '@/lib/site-catalog';
-import type { Data } from '@puckeditor/core';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-
-function isBuilderData(value: unknown): value is Data {
-  if (!value || typeof value !== 'object') return false;
-  const data = value as { content?: unknown; root?: unknown };
-  return Array.isArray(data.content) && !!data.root && typeof data.root === 'object';
-}
 
 function homeMirror(pages: ReturnType<typeof toSitePages>['pages'], homepageId: string) {
   return pages.find((page) => page.id === homepageId) || pages[0];
@@ -75,7 +69,7 @@ export function POST(request: Request) { return withSiteMutation(() => changePag
 
 async function changePage(request: Request) {
   if (!sessionFromRequest(request)) return jsonError('Sign in to edit this site.', 401);
-  const body = await request.json().catch(() => null) as { action?: unknown; pageId?: unknown; title?: unknown; slug?: unknown } | null;
+  const body = await request.json().catch(() => null) as { action?: unknown; pageId?: unknown; title?: unknown; slug?: unknown; page?: unknown } | null;
   const existing = await storage().getSite();
   const site = toSitePages(existing || { draft: starterData, published: starterData }, starterData);
   const action = typeof body?.action === 'string' ? body.action : '';
@@ -87,6 +81,40 @@ async function changePage(request: Request) {
     const slug = uniquePageSlug(typeof body?.slug === 'string' ? body.slug : title, site.pages);
     const props = { ...starterData.root.props, title, socialTitle: '', socialDescription: '', socialImage: '', socialImageAlt: '' };
     const data = normalizeBuilderData({ ...starterData, root: { ...starterData.root, props } }).data;
+    const pages = [...site.pages, { id, slug, title, draft: data, published: null }];
+    const home = homeMirror(pages, site.homepageId);
+    await storage().putSite({ ...existing, published: home.published || starterData, draft: home.draft, pages, homepageId: site.homepageId, version: existing?.version || 0, updatedAt: now, updatedBy: 'admin' });
+    return Response.json({ ok: true, page: summaries(pages).find((page) => page.id === id), pages: summaries(pages), homepageId: site.homepageId });
+  }
+
+  if (action === 'duplicate') {
+    const pageId = typeof body?.pageId === 'string' ? body.pageId : '';
+    const source = site.pages.find((candidate) => candidate.id === pageId);
+    if (!source) return jsonError('The selected page does not exist.', 404);
+    const title = (typeof body?.title === 'string' && body.title.trim() ? body.title.trim() : `Copy of ${source.title}`).slice(0, 120);
+    const slug = uniquePageSlug(typeof body?.slug === 'string' ? body.slug : title, site.pages);
+    const data = normalizeBuilderData({
+      ...source.draft,
+      root: { ...source.draft.root, props: { ...source.draft.root.props, title } },
+    }).data;
+    const id = crypto.randomUUID();
+    const pages = [...site.pages, { id, slug, title, draft: data, published: null }];
+    const home = homeMirror(pages, site.homepageId);
+    await storage().putSite({ ...existing, published: home.published || starterData, draft: home.draft, pages, homepageId: site.homepageId, version: existing?.version || 0, updatedAt: now, updatedBy: 'admin' });
+    return Response.json({ ok: true, page: summaries(pages).find((page) => page.id === id), pages: summaries(pages), homepageId: site.homepageId });
+  }
+
+  if (action === 'import') {
+    const imported = parsePageExport(body?.page);
+    if (!imported) return jsonError('The page export is not valid or is not supported.', 400);
+    if (JSON.stringify(imported.data).length > 1_500_000) return jsonError('The page is too large to import.', 413);
+    const title = (imported.title || pageTitle(imported.data, 'Imported page')).slice(0, 120);
+    const slug = uniquePageSlug(imported.slug || title, site.pages);
+    const data = normalizeBuilderData({
+      ...imported.data,
+      root: { ...imported.data.root, props: { ...imported.data.root.props, title } },
+    }).data;
+    const id = crypto.randomUUID();
     const pages = [...site.pages, { id, slug, title, draft: data, published: null }];
     const home = homeMirror(pages, site.homepageId);
     await storage().putSite({ ...existing, published: home.published || starterData, draft: home.draft, pages, homepageId: site.homepageId, version: existing?.version || 0, updatedAt: now, updatedBy: 'admin' });

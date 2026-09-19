@@ -92,6 +92,29 @@ async function main() {
     check('structured link follows renamed page slug in rendered HTML', linkedHome.includes(`href="/${renamedSlug}#linked-target"`));
     check('new slug serves renamed page', newPage.status === 200 && (await newPage.text()).includes('QA Work Page'));
 
+    const duplicateResponse = await request('/api/site', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'duplicate', pageId: page.id }) });
+    const duplicate = await json(duplicateResponse);
+    check('duplicate page through API', duplicateResponse.ok && duplicate?.page?.id && duplicate.page.id !== page.id && duplicate.page.title === 'Copy of QA Work Renamed', `status=${duplicateResponse.status}`);
+    const duplicateDraft = duplicate?.page?.id ? await siteDraft(duplicate.page.id) : null;
+    check('duplicate copies draft content and starts unpublished', duplicateDraft?.response.ok && duplicateDraft.body.data.root.props.title === 'Copy of QA Work Renamed' && JSON.stringify(duplicateDraft.body.data.content) === JSON.stringify((await siteDraft(page.id)).body.data.content));
+    const duplicatePublic = duplicate?.page?.slug ? await request(`/${duplicate.page.slug}`) : null;
+    check('duplicated page is not public before publish', duplicatePublic?.status === 404, `status=${duplicatePublic?.status}`);
+
+    const importSource = clone((await siteDraft(page.id)).body.data);
+    const importResponse = await request('/api/site', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'import', page: { format: 'open-canvas-page', formatVersion: 1, title: 'QA Imported Page', slug: renamedSlug, data: importSource } }),
+    });
+    const importedPage = await json(importResponse);
+    check('import page export through API', importResponse.ok && importedPage?.page?.id && importedPage.page.slug !== renamedSlug, `status=${importResponse.status}`);
+    const importedDraft = importedPage?.page?.id ? await siteDraft(importedPage.page.id) : null;
+    check('import preserves content, uses a unique slug, and starts unpublished', importedDraft?.response.ok && importedDraft.body.data.root.props.title === 'QA Imported Page' && JSON.stringify(importedDraft.body.data.content) === JSON.stringify(importSource.content));
+    const importedPublic = importedPage?.page?.slug ? await request(`/${importedPage.page.slug}`) : null;
+    check('imported page is not public before publish', importedPublic?.status === 404, `status=${importedPublic?.status}`);
+    const invalidImport = await request('/api/site', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'import', page: { format: 'open-canvas-page', formatVersion: 99 } }) });
+    check('unsupported page export is rejected', invalidImport.status === 400, `status=${invalidImport.status}`);
+
     const settingsResponse = await request('/api/site-settings');
     const settingsInitial = await json(settingsResponse);
     check('settings API authenticated', settingsResponse.ok && settingsInitial?.draft && settingsInitial?.published, `status=${settingsResponse.status}`);
