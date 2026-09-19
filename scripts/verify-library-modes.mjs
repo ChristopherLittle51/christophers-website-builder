@@ -8,7 +8,7 @@ const browser = await chromium.launch();
 const bootstrap = await browser.newPage({ viewport: { width: 390, height: 844 } });
 await bootstrap.goto(`${origin}/fixtures`, { waitUntil: 'networkidle' });
 const allKeys = await bootstrap.locator('[data-fixture-controls] option').allTextContents();
-assert.equal(allKeys.length, 93);
+assert.equal(allKeys.length, 94);
 await bootstrap.close();
 
 const focusedKeys = process.env.QA_MODE_COMPONENTS
