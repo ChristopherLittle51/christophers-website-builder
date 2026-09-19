@@ -26,8 +26,12 @@ test('missing references render text and public references follow the current pa
   assert.match(html, /<span>Missing<\/span>/);
 });
 
+test('image link uses the site link picker for its destination', () => {
+  assert.equal(builderConfig.components.ImageLink.fields?.url?.type, 'custom');
+});
+
 test('every registered default server-renders with its persisted section anchor', () => {
-  assert.equal(Object.keys(builderConfig.components).length, 93);
+  assert.equal(Object.keys(builderConfig.components).length, 94);
   for (const [type, component] of Object.entries(builderConfig.components)) {
     const data = normalizeBuilderData({ root: { props: { title: 'Fixture' } }, content: [{ type, props: { ...structuredClone(component.defaultProps || {}), id: `test-${type}`, name: `section-${type.toLowerCase()}` } }] }).data;
     const html = renderToStaticMarkup(<Render config={builderConfig} data={data} />);
