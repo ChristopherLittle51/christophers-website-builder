@@ -92,7 +92,7 @@
 .builder-image-link--overlay-strong .builder-image-link__wash { background: linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.2) 34%,rgba(0,0,0,.84) 100%); }
 .builder-image-link__eyebrow { align-self: start; font-size: 10px; font-weight: 700; grid-area: 1/1; letter-spacing: .18em; padding: 24px; text-transform: uppercase; }
 .builder-image-link__copy { align-self: end; display: grid; gap: 18px; grid-area: 1/1; padding: 28px 24px 26px; }
-.builder-image-link__copy > strong { display: block; font-size: clamp(42px,5.5vw,72px); font-weight: 400; letter-spacing: -.045em; line-height: .95; max-width: 12ch; text-wrap: balance; }
+.builder-image-link__copy > strong { display: block; font-size: clamp(42px,5.5vw,72px); font-weight: 400; letter-spacing: -.045em; line-height: .95; max-width: 12ch; text-wrap: balance; white-space: pre-line; }
 .builder-image-link__cta { align-items: center; display: flex; font-size: 10px; font-weight: 700; gap: 9px; letter-spacing: .18em; text-transform: uppercase; }
 .builder-image-link__cta b { font-size: 13px; transition: transform 180ms ease; }
 .builder-image-link:hover > img { transform: scale(1.025); }
