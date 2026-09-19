@@ -14,7 +14,9 @@ function choice(value: unknown, allowed: Set<string>, fallback: string) {
   return typeof value === 'string' && allowed.has(value) ? value : fallback;
 }
 
-export function pageDesign(data: Data) {
+export type PageDesign = { style: CSSProperties; className: string };
+
+export function pageDesign(data: Data): PageDesign {
   const props = (data.root?.props || {}) as Record<string, unknown>;
   const paperColor = text(props.paperColor, '#f7f7f3');
   const inkColor = text(props.inkColor, '#050505');
