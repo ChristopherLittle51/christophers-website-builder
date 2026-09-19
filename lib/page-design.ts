@@ -16,8 +16,7 @@ function choice(value: unknown, allowed: Set<string>, fallback: string) {
 
 export type PageDesign = { style: CSSProperties; className: string };
 
-export function pageDesign(data: Data): PageDesign {
-  const props = (data.root?.props || {}) as Record<string, unknown>;
+export function pageDesignFromProps(props: Record<string, unknown>): PageDesign {
   const paperColor = text(props.paperColor, '#f7f7f3');
   const inkColor = text(props.inkColor, '#050505');
   const accentColor = text(props.accentColor, '#d8ff00');
@@ -44,4 +43,8 @@ export function pageDesign(data: Data): PageDesign {
     style,
     className: `site-heading--${headingStyle} site-width--${contentWidth} site-corners--${corners}`,
   };
+}
+
+export function pageDesign(data: Data): PageDesign {
+  return pageDesignFromProps((data.root?.props || {}) as Record<string, unknown>);
 }
