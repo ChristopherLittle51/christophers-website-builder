@@ -1,5 +1,5 @@
 import type { ComponentData, Data } from '@puckeditor/core';
-import { normalizeBuilderData } from './puck-data';
+import { normalizeBuilderData } from './puck-data.ts';
 
 export const BLOCK_CLIPBOARD_FORMAT = 'open-canvas-block' as const;
 export const BLOCK_CLIPBOARD_VERSION = 1 as const;
