@@ -1,9 +1,9 @@
 # Component library audit and organization
 
-This is the organizational contract for the 73 established compatibility Puck
+This is the organizational contract for the 74 established compatibility Puck
 component keys. The 20 Signal systems are cataloged separately in the
 [production component-library handoff](production-library/README.md), which
-records the complete 93-key registry and its current evidence. Each key here
+records the complete 94-key registry and its current evidence. Each key here
 appears in exactly one picker category. Categories describe an author's
 starting point, not whether a block may be nested.
 
@@ -15,7 +15,7 @@ starting point, not whether a block may be nested.
 | Foundations | Heading, Paragraph, Eyebrow / label, Image, Button, Divider, Spacer, Badge / tag, Button group |
 | Layout & composition | Nested layout container, Flex row, Flex column, Inset container, Aspect ratio frame, Media + nested text |
 | Hero options | Composable hero, Editorial hero, Developer hero |
-| Portfolio & storytelling | Split image + text, Text section, Expandable grid, Project cards, Gallery, Before / after, Video, Sticky story, Process timeline, Pull quote, Marquee, Link list, Facts / stats, Project credits, Contact footer |
+| Portfolio & storytelling | Split image + text, Text section, Image link, Expandable grid, Project cards, Gallery, Before / after, Video, Sticky story, Process timeline, Pull quote, Marquee, Link list, Facts / stats, Project credits, Contact footer |
 | Content patterns | Card, Callout, Accordion / details, Feature list, Logo cloud, Avatar group, Metric list, Checklist, Code snippet, Notice |
 | Photo & cinema | Film strip, Contact sheet, Director’s slate, Lens / aperture hero, Camera viewfinder, Storyboard sequence, Showreel feature, Color grade triptych, Film stock details, End credits |
 | Embeds & integrations | GitHub repository, Calendly scheduling, Custom HTML / JS, Embed frame |
@@ -54,7 +54,7 @@ authorize changing persisted Puck data into a different component type.
 | Foundation — use directly in new compositions | `LayoutContainer`, `FlexRow`, `FlexColumn`, `InsetContainer`, `AspectRatio`, `MediaText`, `HeadingBlock`, `ParagraphBlock`, `EyebrowBlock`, `DividerBlock`, `SpacerBlock`, `Badge`, `ImageBlock`, `ButtonBlock`, `ButtonGroup`, `HeroLayout` |
 | Compose first; retain the existing key for compatibility | `TextBlock`, `Card`, `Callout`, `ContactBlock`, `DeveloperCtaBlock`, `OpenSourceBlock` |
 | Partial helper extraction; retain its distinct outer contract | `EditorialHero`, `DeveloperHeroBlock`, `SplitFeature`, `HeaderLinkBar`, `FooterSitemap`, `LinkListBlock`, `SocialLinks`, `SocialIconLinks`, `FeatureList`, `DeveloperFeaturesBlock`, `TimelineBlock`, `ChangelogBlock`, `StatsBlock`, `MetricList`, `DeveloperStatsBlock`, `CreditsBlock`, `LogoCloud`, `AvatarGroup`, `ExpandableGrid`, `ProjectGrid`, `GalleryBlock`, `StoryboardBlock`, `ReelShowcaseBlock`, `EndCreditsBlock`, `CodeSnippet`, `CodeSnippetBlock`, `TechStackBlock`, `DocsCalloutBlock` |
-| Retain bespoke | `Breadcrumbs`, `Accordion`, `Checklist`, `Notice`, `QuoteBlock`, `MarqueeBlock`, `StickyStory`, `BeforeAfter`, `VideoBlock`, `LensHeroBlock`, `FilmStripBlock`, `ContactSheetBlock`, `DirectorsSlateBlock`, `ViewfinderBlock`, `ColorGradeBlock`, `FilmStockBlock`, `TerminalBlock`, `ApiEndpointBlock`, `ArchitectureBlock`, `EmbedFrame`, `GitHubRepositoryBlock`, `CalendlyBlock`, `CustomCodeBlock` |
+| Retain bespoke | `Breadcrumbs`, `Accordion`, `Checklist`, `Notice`, `QuoteBlock`, `MarqueeBlock`, `StickyStory`, `BeforeAfter`, `VideoBlock`, `ImageLink`, `LensHeroBlock`, `FilmStripBlock`, `ContactSheetBlock`, `DirectorsSlateBlock`, `ViewfinderBlock`, `ColorGradeBlock`, `FilmStockBlock`, `TerminalBlock`, `ApiEndpointBlock`, `ArchitectureBlock`, `EmbedFrame`, `GitHubRepositoryBlock`, `CalendlyBlock`, `CustomCodeBlock` |
 
 `DeveloperHeroBlock` intentionally belongs in Hero options rather than
 Developer, while all Photo & cinema keys remain in their specialist category.
