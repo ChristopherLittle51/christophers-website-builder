@@ -1,6 +1,7 @@
 'use client';
 
 import EditorPublishButton from './EditorPublishButton';
+import { EditorBlockActionBar, EditorPasteBlockButton } from './EditorBlockTransfer';
 import EditorSharedPreview from './EditorSharedPreview';
 import { defaultSiteSettings, type SiteSettings } from '@/lib/site-settings';
 import SiteSettingsPanel from './SiteSettingsPanel';
@@ -104,7 +105,8 @@ export default function EditorClient({ editorName }: { editorName: string }) {
   // typing, catalog updates and autosave status changes.
   const overrides = useMemo(() => ({
     preview: EditorSharedPreview,
-    headerActions: () => <EditorPublishButton onPublish={publish} />,
+    actionBar: EditorBlockActionBar,
+    headerActions: () => <><EditorPasteBlockButton /><EditorPublishButton onPublish={publish} /></>,
   }), [publish]);
 
   const handleChange = (nextData: Data) => {
