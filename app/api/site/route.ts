@@ -6,7 +6,6 @@ import { isBuilderData, parsePageExport } from '@/lib/page-transfer';
 import { jsonError, storage, type SiteDocument } from '@/lib/storage';
 import { starterData } from '@/lib/templates';
 import { buildPageCatalog } from '@/lib/site-catalog';
-import type { Data } from '@puckeditor/core';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
