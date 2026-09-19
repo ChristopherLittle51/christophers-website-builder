@@ -4,6 +4,7 @@ import type { Data } from '@puckeditor/core';
 import { buildPageCatalog, collectSections, resolveLink, safeHref } from './site-catalog.ts';
 import { getSiteSettings, normalizeSiteSettings, navigationLinks } from './site-settings.ts';
 import { shellMode, withoutComponents } from './site-render-data.ts';
+import { pageDesign } from './page-design.ts';
 
 const doc = (title: string, name = 'mission') => ({ root: { props: { title } }, content: [{ type: 'HeadingBlock', props: { id: 'section-1', name, text: 'Mission' } }] }) as Data;
 const pages = [{ id: 'home-id', slug: 'home', title: 'Draft home title', draft: doc('Draft only'), published: doc('Public home') }, { id: 'about-id', slug: 'about', title: 'Draft about', draft: doc('Draft about'), published: doc('Public about') }, { id: 'private-id', slug: 'private', title: 'Private title', draft: doc('Private secret'), published: null }];
@@ -54,4 +55,38 @@ test('shared settings normalize legacy records and keep published settings indep
 test('automatic navigation applies ordering, visibility, labels and manual additions', () => {
   const settings = normalizeSiteSettings({ navigation: [{ pageId: 'about-id', label: 'Studio', group: 'Company', hidden: false }, { pageId: 'home-id', hidden: true }], links: [{ label: 'Contact', href: 'mailto:hello@example.com', group: 'Contact' }] });
   assert.deepEqual(navigationLinks(settings, buildPageCatalog(pages, 'home-id', 'published')).map(link => link.label), ['Studio', 'Contact']);
+});
+
+
+test('shared navigation design derives from the current page root choices', () => {
+  const design = pageDesign({
+    root: { props: {
+      paperColor: '#111111',
+      inkColor: '#f5f5f5',
+      accentColor: '#ff4d00',
+      displayFont: 'playfair',
+      bodyFont: 'manrope',
+      accentFont: 'ibm-plex-mono',
+      headingStyle: 'classic',
+      contentWidth: 'focused',
+      corners: 'round',
+    } },
+    content: [],
+  } as unknown as Data);
+
+  assert.equal(design.style.background, '#111111');
+  assert.equal(design.style.color, '#f5f5f5');
+  assert.equal(design.style['--site-accent' as keyof typeof design.style], '#ff4d00');
+  assert.match(String(design.style['--font-display' as keyof typeof design.style]), /Playfair/);
+  assert.match(String(design.style['--font-body' as keyof typeof design.style]), /Manrope/);
+  assert.match(String(design.style['--font-accent' as keyof typeof design.style]), /IBM Plex Mono/);
+  assert.equal(design.className, 'site-heading--classic site-width--focused site-corners--round');
+});
+
+test('shared navigation design falls back safely for missing or unknown root choices', () => {
+  const design = pageDesign({ root: { props: { displayFont: 'missing-font', contentWidth: 'oversized' } }, content: [] } as unknown as Data);
+  assert.equal(design.style.background, '#f7f7f3');
+  assert.equal(design.style.color, '#050505');
+  assert.match(String(design.style.fontFamily), /Inter/);
+  assert.equal(design.className, 'site-heading--bold site-width--full site-corners--sharp');
 });
