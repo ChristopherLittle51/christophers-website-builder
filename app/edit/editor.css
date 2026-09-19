@@ -11,7 +11,7 @@
 .editor-pages__list { overflow-x: auto; scrollbar-width: thin; }
 .editor-pages button { background: transparent; border: 1px solid rgba(5,5,5,.45); color: inherit; cursor: pointer; flex: 0 0 auto; font: 800 9px/1 var(--font-mono,monospace); letter-spacing: .08em; padding: 8px 10px; text-transform: uppercase; }
 .editor-pages__list button.is-active { background: #050505; color: #d8ff00; }
-.editor-pages__actions button:last-child:enabled { border-color: #8b1616; color: #8b1616; }
+.editor-pages__actions .is-delete:enabled { border-color: #8b1616; color: #8b1616; }
 .editor-pages button:disabled { cursor: not-allowed; opacity: .4; }
 .editor-page-import { display: none; }
 .editor-page-error { color: #8b1616; font: 700 9px/1.25 var(--font-mono,monospace); max-width: 220px; }
