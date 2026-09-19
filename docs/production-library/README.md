@@ -23,7 +23,7 @@ the code so future work does not need to reconstruct the persistence contract.
   last import in `app/globals.css`, so these shared safeguards win the final
   cascade while component-specific rules remain readable in their family files.
 
-The registry currently has 93 persisted component type keys: 73 established
+The registry currently has 94 persisted component type keys: 74 established
 compatibility keys and 20 Signal systems. Renaming or removing one requires a
 versioned data migration. Moving the TypeScript object that defines a key does
 not require a migration when its key, props, defaults, and rendered behavior
@@ -51,12 +51,13 @@ root element and merge different props; order changes are observable.
 
 ## Current production evidence
 
-The frozen catalog contract covers all 93 keys, picker ownership, nesting, and
+The frozen catalog contract covers all 94 keys, picker ownership, nesting, and
 persisted-key compatibility. The dated [component QA matrix](COMPONENT_QA_MATRIX.md)
-records the latest published fixture run for every key at 320, 390, 768, and
-1280 CSS pixels, including horizontal overflow, broken images, uncaught browser
-errors, and axe WCAG checks. Use the matrix as review evidence for that run;
-rerun `npm run test:browser` after component changes.
+records the latest published fixture run at 320, 390, 768, and 1280 CSS
+pixels, including horizontal overflow, broken images, uncaught browser errors,
+and axe WCAG checks. The checked-in matrix predates `ImageLink` and therefore
+covers the previous 93-key registry; regenerate it with `npm run test:browser`
+after this component change.
 
 Two legacy media gaps were corrected. `ProjectGrid` now has a description for
 each project image, and `GalleryBlock` has a description for each of its six
@@ -77,7 +78,7 @@ preference.
 Complete these checks for component work and record any intentionally skipped
 item in the change description.
 
-- [ ] The frozen catalog test still contains all 93 persisted keys, including
+- [ ] The frozen catalog test still contains all 94 persisted keys, including
       the 20 Signal systems.
 - [ ] Every component appears in exactly one picker category.
 - [ ] Every slot-compatible component is in the derived allowlist.
@@ -104,7 +105,7 @@ item in the change description.
 
 ## Responsive acceptance fixtures
 
-`scripts/verify-production-library.mjs` visits each of the 93 fixture
+`scripts/verify-production-library.mjs` visits each of the 94 fixture
 components in published mode at 320, 390, 768, and 1280 pixels. It records
 document overflow, broken images, browser errors, and axe violations in the
 report used for the [QA matrix](COMPONENT_QA_MATRIX.md). Add targeted fixture
