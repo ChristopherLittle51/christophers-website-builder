@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Data } from '@puckeditor/core';
 import { normalizeBuilderData } from './puck-data.ts';
+import { makeBlockClipboard, parseBlockClipboard, pasteBlock } from './block-transfer.ts';
 import { heroCompositionTemplate } from './templates.ts';
 
 const brokenNestedData: Data = {
@@ -91,4 +92,58 @@ test('keeps the composable hero template globally identifiable through its neste
   assert.equal(hero.props?.layout, 'split');
   assert.equal(new Set(ids).size, ids.length);
   assert.equal(normalizeBuilderData(result.data).changed, false);
+});
+
+
+test('block clipboard preserves nested content but assigns fresh component ids on paste', () => {
+  const source = {
+    type: 'LayoutContainer',
+    props: {
+      id: 'source-layout',
+      name: 'copied-group',
+      first: [{ type: 'ParagraphBlock', props: { id: 'source-child', name: 'copied-child', text: 'Nested copy' } }],
+      second: [],
+    },
+  } as any;
+  const destination = normalizeBuilderData({
+    root: { props: {} },
+    content: [{ type: 'HeadingBlock', props: { id: 'target-heading', name: 'target', text: 'Target' } }],
+    zones: {},
+  } as Data).data;
+
+  const clipboard = parseBlockClipboard(JSON.parse(JSON.stringify(makeBlockClipboard(source))));
+  assert.ok(clipboard);
+  const pasted = pasteBlock(destination, clipboard!, { index: 0, zone: 'root:default-zone' });
+  const group = pasted.content[1] as any;
+  const child = group.props.first[0];
+
+  assert.equal(group.type, 'LayoutContainer');
+  assert.equal(child.props.text, 'Nested copy');
+  assert.notEqual(group.props.id, 'source-layout');
+  assert.notEqual(child.props.id, 'source-child');
+  assert.equal((pasted.content[0] as any).props.id, 'target-heading');
+});
+
+test('pastes after a selected component inside a nested slot', () => {
+  const destination = normalizeBuilderData({
+    root: { props: {} },
+    content: [{
+      type: 'LayoutContainer',
+      props: {
+        id: 'layout-target',
+        name: 'layout-target',
+        first: [{ type: 'ParagraphBlock', props: { id: 'first-child', name: 'first-child', text: 'Before' } }],
+        second: [],
+      },
+    }],
+    zones: {},
+  } as unknown as Data).data;
+  const clipboard = makeBlockClipboard({ type: 'ParagraphBlock', props: { id: 'copied-paragraph', name: 'copied-paragraph', text: 'After' } } as any);
+  const pasted = pasteBlock(destination, clipboard, { index: 0, zone: 'layout-target:first' });
+  const children = (pasted.content[0] as any).props.first;
+
+  assert.equal(children.length, 2);
+  assert.equal(children[0].props.text, 'Before');
+  assert.equal(children[1].props.text, 'After');
+  assert.notEqual(children[1].props.id, 'copied-paragraph');
 });
