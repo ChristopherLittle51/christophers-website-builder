@@ -6,7 +6,8 @@ const persistedComponentKeys = `Accordion ApiEndpointBlock ArchitectureBlock Asp
 
 test('keeps the persisted component type contract stable', () => {
   assert.deepEqual(componentKeySnapshot.filter((key) => persistedComponentKeys.includes(key)).sort(), persistedComponentKeys);
-  assert.equal(componentKeySnapshot.length, 93);
+  assert.equal(componentKeySnapshot.length, 94);
+  assert.ok(componentKeySnapshot.includes('ImageLink'));
 });
 
 test('assigns every component to exactly one picker category and nested slot', () => {
