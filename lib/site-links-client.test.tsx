@@ -5,6 +5,9 @@ import { Render } from '@puckeditor/core';
 import { builderConfig } from './site-builder';
 import { normalizeBuilderData } from './puck-data';
 import { enhanceLinkFields, SiteLinksProvider, SiteLink } from './site-links-client';
+import { SharedHeader, SharedFooter } from './site-navigation';
+import { normalizeSiteSettings } from './site-settings';
+import { pageDesign } from './page-design';
 
 test('enhances destinations without replacing names, labels, media, or embed sources', () => {
   const text = (label: string) => ({ type: 'text', label });
@@ -34,4 +37,40 @@ test('every registered default server-renders with its persisted section anchor'
     assert.ok(!html.includes('[object Object]'), `${type} retains authored scalar style props`);
     assert.ok(html.includes(`id="section-${type.toLowerCase()}"`), `${type} must forward its public anchor to the actual DOM`);
   }
+});
+
+
+test('shared header and footer render with the current page design tokens', () => {
+  const pages = [{ id: 'home', path: '/', slug: 'home', title: 'Home', published: true, sections: [] }];
+  const settings = normalizeSiteSettings({ enabled: true, brand: 'Page-aware studio', footerText: 'Footer copy' });
+  const design = pageDesign({
+    root: { props: {
+      paperColor: '#121212',
+      inkColor: '#f2f2f2',
+      accentColor: '#ff6600',
+      displayFont: 'playfair',
+      bodyFont: 'manrope',
+      accentFont: 'ibm-plex-mono',
+      headingStyle: 'classic',
+      contentWidth: 'focused',
+      corners: 'soft',
+    } },
+    content: [],
+  } as any);
+
+  const html = renderToStaticMarkup(
+    <SiteLinksProvider value={{ pages, currentPageId: 'home' }}>
+      <SharedHeader settings={settings} design={design} />
+      <SharedFooter settings={settings} design={design} />
+    </SiteLinksProvider>,
+  );
+
+  assert.match(html, /shared-site-header site-heading--classic site-width--focused site-corners--soft/);
+  assert.match(html, /shared-site-footer site-heading--classic site-width--focused site-corners--soft/);
+  assert.match(html, /--site-paper:#121212/);
+  assert.match(html, /--site-ink:#f2f2f2/);
+  assert.match(html, /--site-accent:#ff6600/);
+  assert.match(html, /Playfair/);
+  assert.match(html, /Manrope/);
+  assert.match(html, /IBM Plex Mono/);
 });
