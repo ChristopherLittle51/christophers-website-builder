@@ -53,6 +53,14 @@ links remain outside Puck's draggable page content. Page-level modes hide the
 published inherited regions; existing manual content remains editable so it
 can be removed or adjusted deliberately.
 
+Inherited header and footer chrome follows the current page's root design
+settings rather than using a separate global visual theme. Background, text
+and accent colors, display/body/accent fonts, heading treatment, and page-width
+choice are derived from the active draft in the editor and from the active
+published document on the public site. Switching pages therefore updates the
+shared navigation styling with that page while retaining the same shared links
+and footer content.
+
 ## API and persistence
 
 - `/api/site-settings`: authenticated GET and PUT. PUT accepts

@@ -1,9 +1,8 @@
 'use client';
 
-import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
-import { FONT_FAMILIES } from '../typography';
 import { colorField, directFontField, imageField } from './shared';
+import { pageDesignFromProps } from '../page-design';
 
 type ReturnToTopButtonProps = { enabled: boolean; label: string; appearance: string; position: string; isEditing: boolean };
 
@@ -26,8 +25,8 @@ export const rootConfig = {
   fields: { title: { type: 'text', label: 'Browser title' }, favicon: imageField('Favicon (use a square image)'), socialTitle: { type: 'text', label: 'Social sharing title' }, socialDescription: { type: 'textarea', label: 'Social sharing description' }, socialImage: imageField('Social preview image (wide, ideally 1.91:1)'), socialImageAlt: { type: 'text', label: 'Social preview image description' }, displayFont: directFontField('Display / headline font'), bodyFont: directFontField('Body font'), accentFont: directFontField('Accent / caption font'), headingStyle: { type: 'radio', label: 'Heading weight', options: [{ label: 'Bold', value: 'bold' }, { label: 'Regular', value: 'classic' }, { label: 'Mixed', value: 'mixed' }] }, paperColor: colorField('Background color'), inkColor: colorField('Text color'), accentColor: colorField('Accent color'), contentWidth: { type: 'radio', label: 'Page width', options: [{ label: 'Focused', value: 'focused' }, { label: 'Standard', value: 'standard' }, { label: 'Full bleed', value: 'full' }] }, corners: { type: 'radio', label: 'Image corners', options: [{ label: 'Sharp', value: 'sharp' }, { label: 'Soft', value: 'soft' }, { label: 'Round', value: 'round' }] }, returnToTop: { type: 'radio', label: 'Return to top button', options: [{ label: 'Hidden', value: 'hidden' }, { label: 'Show on scroll', value: 'show' }] }, returnToTopLabel: { type: 'text', label: 'Return to top label' }, returnToTopAppearance: { type: 'radio', label: 'Return to top style', options: [{ label: 'Ink', value: 'ink' }, { label: 'Accent', value: 'accent' }, { label: 'Outline', value: 'outline' }] }, returnToTopPosition: { type: 'radio', label: 'Return to top position', options: [{ label: 'Right', value: 'right' }, { label: 'Left', value: 'left' }] } },
   defaultProps: { title: 'Studio Name — Creative Portfolio', favicon: '/favicon.svg', socialTitle: '', socialDescription: '', socialImage: '', socialImageAlt: '', displayFont: 'space-grotesk', bodyFont: 'inter', accentFont: 'fraunces', headingStyle: 'bold', paperColor: '#f7f7f3', inkColor: '#050505', accentColor: '#d8ff00', contentWidth: 'full', corners: 'sharp', returnToTop: 'hidden', returnToTopLabel: 'Return to top', returnToTopAppearance: 'ink', returnToTopPosition: 'right' },
   render: ({ children, displayFont = 'space-grotesk', bodyFont = 'inter', accentFont = 'fraunces', headingStyle = 'bold', paperColor = '#f7f7f3', inkColor = '#050505', accentColor = '#d8ff00', contentWidth = 'full', corners = 'sharp', returnToTop = 'hidden', returnToTopLabel = 'Return to top', returnToTopAppearance = 'ink', returnToTopPosition = 'right', puck }: any) => {
-    const style = { '--site-paper': paperColor, '--site-ink': inkColor, '--site-accent': accentColor, '--font-display': FONT_FAMILIES[displayFont], '--font-body': FONT_FAMILIES[bodyFont], '--font-accent': FONT_FAMILIES[accentFont] } as CSSProperties;
-    return <div className={`site-canvas site-heading--${headingStyle} site-width--${contentWidth} site-corners--${corners}`} style={style}>{children}<ReturnToTopButton enabled={returnToTop === 'show'} label={returnToTopLabel} appearance={returnToTopAppearance} position={returnToTopPosition} isEditing={Boolean(puck?.isEditing)} /></div>;
+    const design = pageDesignFromProps({ displayFont, bodyFont, accentFont, headingStyle, paperColor, inkColor, accentColor, contentWidth, corners });
+    return <div className={`site-canvas ${design.className}`} style={design.style}>{children}<ReturnToTopButton enabled={returnToTop === 'show'} label={returnToTopLabel} appearance={returnToTopAppearance} position={returnToTopPosition} isEditing={Boolean(puck?.isEditing)} /></div>;
   },
 };
 
