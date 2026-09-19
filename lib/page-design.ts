@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Data } from '@puckeditor/core';
-import { FONT_FAMILIES } from './typography';
+import { FONT_FAMILIES } from './typography.ts';
 
 const headingStyles = new Set(['bold', 'classic', 'mixed']);
 const contentWidths = new Set(['focused', 'standard', 'full']);
