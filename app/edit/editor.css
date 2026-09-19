@@ -13,6 +13,8 @@
 .editor-pages__list button.is-active { background: #050505; color: #d8ff00; }
 .editor-pages__actions button:last-child:enabled { border-color: #8b1616; color: #8b1616; }
 .editor-pages button:disabled { cursor: not-allowed; opacity: .4; }
+.editor-page-import { display: none; }
+.editor-page-error { color: #8b1616; font: 700 9px/1.25 var(--font-mono,monospace); max-width: 220px; }
 .editor-dialog-backdrop { align-items: center; background: rgba(5,5,5,.62); display: flex; inset: 0; justify-content: center; padding: 20px; position: fixed; z-index: 100; }
 .editor-dialog { background: #f7f7f3; border: 2px solid #050505; box-shadow: 8px 8px 0 #d8ff00; color: #050505; display: grid; gap: 18px; max-width: 440px; padding: 18px; width: min(100%,440px); }
 .editor-dialog > div:first-child,.editor-dialog footer { align-items: center; display: flex; justify-content: space-between; }
