@@ -195,6 +195,7 @@ export default function EditorClient({ editorName }: { editorName: string }) {
       page = null;
     }
     if (!page) {
+      setSaveState('saved');
       setPageActionError('That file is not a supported Open Canvas page export.');
       return;
     }
