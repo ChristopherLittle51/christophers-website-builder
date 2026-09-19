@@ -1,1 +1,1 @@
-export const portfolioKeys = ['SplitFeature', 'TextBlock', 'ExpandableGrid', 'ProjectGrid', 'GalleryBlock', 'BeforeAfter', 'VideoBlock', 'StickyStory', 'TimelineBlock', 'QuoteBlock', 'MarqueeBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'ContactBlock'] as const;
+export const portfolioKeys = ['SplitFeature', 'TextBlock', 'ImageLink', 'ExpandableGrid', 'ProjectGrid', 'GalleryBlock', 'BeforeAfter', 'VideoBlock', 'StickyStory', 'TimelineBlock', 'QuoteBlock', 'MarqueeBlock', 'LinkListBlock', 'StatsBlock', 'CreditsBlock', 'ContactBlock'] as const;
