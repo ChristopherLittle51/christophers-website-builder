@@ -20,6 +20,43 @@ export const portfolioComponents: Record<string, any> = {
         defaultProps: { eyebrow: 'A note from the studio', heading: 'Stories should feel human.', body: 'Add a short paragraph here. Click the text to edit it directly, or use the controls in the sidebar.', eyebrowFont: 'inherit', headingFont: 'inherit', bodyFont: 'inherit', headingSize: 'standard', headingTracking: 'tight', align: 'left' },
         render: ({ eyebrow, heading, body, eyebrowFont, headingFont, bodyFont, headingSize, headingTracking, align }) => <section className={`builder-text builder-text--${align}`}><p className="builder-kicker" style={fontStyle(eyebrowFont)}>{eyebrow}</p><h2 className={typeClass('builder-text-title', headingSize, headingTracking)} style={fontStyle(headingFont)}>{heading}</h2><div className="builder-markdown" style={fontStyle(bodyFont)}><MarkdownText block>{body}</MarkdownText></div></section>,
   },
+  ImageLink: {
+        label: 'Image link',
+        fields: {
+          image: imageField('Background image'),
+          crop: cropField('Image crop'),
+          alt: { type: 'text', label: 'Image description' },
+          eyebrow: { type: 'text', label: 'Index / eyebrow', contentEditable: true },
+          eyebrowFont: fontField('Index / eyebrow font'),
+          title: { type: 'textarea', label: 'Headline', contentEditable: true },
+          titleFont: fontField('Headline font'),
+          ctaLabel: { type: 'text', label: 'Link label', contentEditable: true },
+          ctaFont: fontField('Link label font'),
+          url: { type: 'text', label: 'Link destination' },
+          overlay: { type: 'radio', label: 'Image overlay', options: [{ label: 'Soft', value: 'soft' }, { label: 'Medium', value: 'medium' }, { label: 'Strong', value: 'strong' }] },
+          height: { type: 'radio', label: 'Card height', options: [{ label: 'Compact', value: 'compact' }, { label: 'Standard', value: 'standard' }, { label: 'Tall', value: 'tall' }] },
+        },
+        defaultProps: {
+          image: '/images/photo-1.jpg',
+          crop: 'center center',
+          alt: 'Featured photography',
+          eyebrow: '001',
+          eyebrowFont: 'ibm-plex-mono',
+          title: 'Keep the part you can’t stage.',
+          titleFont: 'fraunces',
+          ctaLabel: 'Explore sessions',
+          ctaFont: 'ibm-plex-mono',
+          url: '#work',
+          overlay: 'medium',
+          height: 'standard',
+        },
+        render: ({ image, crop, alt, eyebrow, eyebrowFont, title, titleFont, ctaLabel, ctaFont, url, overlay, height, puck }) => {
+          const content = <><img src={image} alt={alt || ''} style={imagePosition(crop)} /><span className="builder-image-link__wash" aria-hidden="true" /><span className="builder-image-link__eyebrow" style={fontStyle(eyebrowFont)}>{eyebrow}</span><span className="builder-image-link__copy"><strong style={fontStyle(titleFont)}>{title}</strong><span className="builder-image-link__cta" style={fontStyle(ctaFont)}>{ctaLabel}<b aria-hidden="true">→</b></span></span></>;
+          return puck?.isEditing
+            ? <div className={`builder-image-link builder-image-link--overlay-${overlay} builder-image-link--height-${height}`}>{content}</div>
+            : <a className={`builder-image-link builder-image-link--overlay-${overlay} builder-image-link--height-${height}`} href={url}>{content}</a>;
+        },
+  },
   ExpandableGrid: {
         label: 'Expandable image grid',
         fields: { number: { type: 'text', label: 'Section number' }, title: { type: 'text', label: 'Title', contentEditable: true }, intro: { type: 'textarea', label: 'Introduction', contentEditable: true }, titleFont: fontField('Title font'), introFont: fontField('Introduction font'), layout: { type: 'radio', label: 'Layout', options: [{ label: 'Editorial', value: 'editorial' }, { label: 'Uniform', value: 'uniform' }, { label: 'Filmstrip', value: 'filmstrip' }] }, density: { type: 'select', label: 'Grid density', options: [{ label: 'Large images', value: 'large' }, { label: 'Medium images', value: 'medium' }, { label: 'Small images', value: 'small' }] }, gap: { type: 'radio', label: 'Gap', options: [{ label: 'Tight', value: 'tight' }, { label: 'Comfortable', value: 'medium' }, { label: 'Airy', value: 'airy' }] }, items: { type: 'array', label: 'Images', min: 1, max: 24, arrayFields: { image: imageField('Image'), crop: cropField(), alt: { type: 'text', label: 'Image description' }, caption: { type: 'text', label: 'Caption' }, shape: { type: 'select', label: 'Grid shape', options: [{ label: 'Automatic', value: 'auto' }, { label: 'Wide', value: 'wide' }, { label: 'Tall', value: 'tall' }, { label: 'Large', value: 'large' }] } }, defaultItemProps: (index) => ({ image: `/images/photo-${(index % 10) + 1}.jpg`, crop: 'center center', alt: 'Portfolio photograph', caption: `Image ${index + 1}`, shape: 'auto' }), getItemSummary: (item, index) => item.caption || `Image ${(index || 0) + 1}` } },
