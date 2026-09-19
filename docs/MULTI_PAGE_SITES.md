@@ -34,3 +34,16 @@ Every new Puck component now receives a deterministic generated section name
 during Puck's insert-time `resolveData` pass. This keeps the editable sidebar
 field, the rendered anchor, and saved data aligned without remounting the
 editor or moving the canvas viewport.
+
+
+## Copying blocks between pages
+
+Select a block in the canvas and use **Copy** in its action bar. The copied block
+is kept in the current browser tab while switching pages. On the destination
+page, select a block and choose **Paste** to insert the copy immediately after
+it, including any nested slot content. Use **Paste block** in the editor header
+to append the copied block to the end of a page, including an empty page.
+
+Pasted blocks receive fresh Puck component IDs before they are saved. Authored
+section names and content are retained; normal page normalization resolves any
+name collisions in the destination document.
