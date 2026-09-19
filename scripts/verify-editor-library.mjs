@@ -6,7 +6,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 await page.goto(`${origin}/fixtures`, { waitUntil: 'networkidle' });
 const allKeys = await page.locator('[data-fixture-controls] option').allTextContents();
-assert.equal(allKeys.length, 93);
+assert.equal(allKeys.length, 94);
 const keys = process.env.QA_COMPONENTS ? process.env.QA_COMPONENTS.split(',') : allKeys;
 const results = [];
 for (const key of keys) {

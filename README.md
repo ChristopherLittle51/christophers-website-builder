@@ -8,7 +8,7 @@ It is a normal Next.js application—not a hosted-platform project. Run it on a 
 
 - Mobile-first drag-and-drop editing powered by [Puck](https://puckeditor.com/).
 - Six starter templates, including a composable hero starter and a complete Director’s treatment for photography and moving image.
-- Ninety-three persisted blocks organized into foundations, composition, hero options, portfolio storytelling, content patterns, Signal systems, media, integrations, developer, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
+- Ninety-four persisted blocks organized into foundations, composition, hero options, portfolio storytelling, content patterns, Signal systems, media, integrations, developer, and [ten production-inspired photo and cinema blocks](docs/PHOTOGRAPHY_AND_CINEMA_BLOCKS.md).
 - Recursive nested containers with one to four columns and container-query reflow.
 - Expandable image grids with editorial, uniform, and filmstrip layouts.
 - Per-field and global font control using nine bundled open-source font families.
@@ -117,11 +117,11 @@ The main registry is `lib/site-builder.tsx`.
 - Foundations: heading, paragraph, eyebrow, image, button, divider, spacer, badge, and button group.
 - Layout & composition: recursive 1–4 column containers, flex rows/columns, inset and aspect-ratio wrappers, and media with a nested content slot.
 - Hero options: a new slot-based composable hero with split, overlay, and text-only treatments, plus editorial and technical presets. See [hero authoring](docs/HERO_COMPONENTS.md).
-- Portfolio & storytelling: split feature, text section, grids, project cards, gallery, before/after comparison, video, sticky story, timeline, pull quote, marquee, links, facts, credits, and contact.
+- Portfolio & storytelling: split feature, text section, editorial image links, grids, project cards, gallery, before/after comparison, video, sticky story, timeline, pull quote, marquee, links, facts, credits, and contact.
 - Content patterns: cards, callouts, accordions, feature lists, logos, avatars, metrics, checklists, code snippets, and notices.
 - Signal systems: twenty focused systems for command palettes, project navigation, research, launch, status, comparison, and interactive briefs.
 - Navigation & integrations: editable header/link bar, footer/site map, breadcrumbs, social links, Calendly, public GitHub repository metadata, sandboxed custom HTML/CSS/JS, and generic embeds.
-- The exact category map and composition decisions live in [the component-library audit](docs/COMPONENT_LIBRARY_AUDIT.md). The production ownership boundaries, 93-key checklist, and dated per-component evidence are in [the production component-library handoff](docs/production-library/README.md).
+- The exact category map and composition decisions live in [the component-library audit](docs/COMPONENT_LIBRARY_AUDIT.md). The production ownership boundaries, 94-key checklist, and dated per-component evidence are in [the production component-library handoff](docs/production-library/README.md).
 
 Templates are ordinary Puck JSON in `lib/templates.ts`. A new template must use registered component names and globally unique IDs. New component types should be added to `nestedAllowlist` so they can be used inside containers.
 
