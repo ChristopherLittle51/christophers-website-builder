@@ -11,7 +11,7 @@ const errors = [];
 page.on('pageerror', error => errors.push(error.message));
 await page.goto(`${origin}/fixtures`, { waitUntil: 'networkidle' });
 const allKeys = await page.locator('[data-fixture-controls] option').allTextContents();
-if (allKeys.length !== 93) { await browser.close(); throw new Error(`Expected 93 fixture components, got ${allKeys.length}. Check server build errors.`); }
+if (allKeys.length !== 94) { await browser.close(); throw new Error(`Expected 94 fixture components, got ${allKeys.length}. Check server build errors.`); }
 const keys = process.env.QA_COMPONENTS ? process.env.QA_COMPONENTS.split(',') : allKeys;
 const results = [];
 for (const key of keys) {
