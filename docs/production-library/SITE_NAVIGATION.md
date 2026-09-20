@@ -61,6 +61,14 @@ published document on the public site. Switching pages therefore updates the
 shared navigation styling with that page while retaining the same shared links
 and footer content.
 
+The shared shell is also intrinsically responsive rather than depending only
+on viewport breakpoints. The header allows its navigation to wrap below the
+brand before squeezing the brand into character-by-character breaks, and the
+footer uses wrapping flex/grid tracks so its intro and navigation groups stack
+cleanly in narrow editor canvases and on mobile screens. At 700 CSS pixels and
+below, header links become a single-column list and the footer uses compact
+mobile spacing.
+
 ## API and persistence
 
 - `/api/site-settings`: authenticated GET and PUT. PUT accepts
