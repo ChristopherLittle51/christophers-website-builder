@@ -181,6 +181,37 @@ try {
   const convertedFrame = await previewFrame();
   await convertedFrame.locator('.shared-site-header').waitFor({ state: 'visible' });
   assert.equal(await convertedFrame.locator('.shared-site-brand').innerText(), draftBrand);
+  const narrowShell = await convertedFrame.evaluate(() => {
+    const header = document.querySelector('.shared-site-header');
+    const footer = document.querySelector('.shared-site-footer');
+    if (!(header instanceof HTMLElement) || !(footer instanceof HTMLElement)) throw new Error('shared shell is incomplete');
+    header.style.width = '360px';
+    footer.style.width = '360px';
+    const brand = header.querySelector('.shared-site-brand');
+    const headerNav = header.querySelector('nav');
+    const footerIntro = footer.firstElementChild;
+    const footerNav = footer.querySelector('nav');
+    if (!(brand instanceof HTMLElement) || !(headerNav instanceof HTMLElement) || !(footerIntro instanceof HTMLElement) || !(footerNav instanceof HTMLElement)) throw new Error('shared shell children are incomplete');
+    const brandBox = brand.getBoundingClientRect();
+    const headerNavBox = headerNav.getBoundingClientRect();
+    const footerIntroBox = footerIntro.getBoundingClientRect();
+    const footerNavBox = footerNav.getBoundingClientRect();
+    return {
+      headerOverflow: header.scrollWidth - header.clientWidth,
+      footerOverflow: footer.scrollWidth - footer.clientWidth,
+      brandWidth: brandBox.width,
+      headerNavTop: headerNavBox.top,
+      brandBottom: brandBox.bottom,
+      footerNavTop: footerNavBox.top,
+      footerIntroBottom: footerIntroBox.bottom,
+    };
+  });
+  assert.ok(narrowShell.headerOverflow <= 1, `shared header overflows a 360px container by ${narrowShell.headerOverflow}px`);
+  assert.ok(narrowShell.footerOverflow <= 1, `shared footer overflows a 360px container by ${narrowShell.footerOverflow}px`);
+  assert.ok(narrowShell.brandWidth >= 120, `shared brand collapsed to ${narrowShell.brandWidth}px`);
+  assert.ok(narrowShell.headerNavTop >= narrowShell.brandBottom - 1, 'shared mobile nav did not wrap below the brand');
+  assert.ok(narrowShell.footerNavTop >= narrowShell.footerIntroBottom - 1, 'shared mobile footer navigation did not wrap below the intro');
+  pass('shared shell remains responsive in a narrow container', narrowShell);
   pass('draft conversion removed manual shells and showed shared preview', { types: convertedTypes, sharedBrand: draftBrand });
 
   await settingsDialog.getByRole('button', { name: 'Close site settings', exact: true }).click();
