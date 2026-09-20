@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
 import type { Data } from '@puckeditor/core';
 import { buildPageCatalog, collectSections, resolveLink, safeHref } from './site-catalog.ts';
 import { getSiteSettings, normalizeSiteSettings, navigationLinks } from './site-settings.ts';
@@ -89,4 +90,14 @@ test('shared navigation design falls back safely for missing or unknown root cho
   assert.equal(design.style.color, '#050505');
   assert.match(String(design.style.fontFamily), /Inter/);
   assert.equal(design.className, 'site-heading--bold site-width--full site-corners--sharp');
+});
+
+
+test('shared navigation keeps intrinsic mobile-safe wrapping rules', () => {
+  const css = readFileSync(new URL('./site-navigation.css', import.meta.url), 'utf8');
+  assert.match(css, /\.shared-site-header\s*\{[^}]*flex-wrap:\s*wrap/);
+  assert.match(css, /\.shared-site-brand\s*\{[^}]*overflow-wrap:\s*normal[^}]*word-break:\s*normal/);
+  assert.match(css, /\.shared-site-header nav\s*\{[^}]*flex:\s*1 1 320px[^}]*min-width:\s*0/);
+  assert.match(css, /\.shared-site-footer\s*\{[^}]*display:\s*flex[^}]*flex-wrap:\s*wrap/);
+  assert.match(css, /@media\(max-width:700px\)[\s\S]*\.shared-site-header nav\s*\{[^}]*grid-template-columns:\s*minmax\(0,1fr\)/);
 });
